@@ -37,13 +37,14 @@ wr () {
                                                        
                                                          }
                                                           4line() {
-                                                                                                                                                                                                                                  rm -rf ~/kali-theme
-                                                                                                                                                                                                                                  cd
-                                                                                                                                                                                                                                  git clone https://github.com/h4ck3r0/kali-theme
-                                                                                                                                                                                                                                  cd ~/kali-theme ; bash os.sh
-                                                                                                                                                                                                                                  }
+                                                                  rm -rf ~/kali-theme
+                                                                  cd
+                                                                  git clone https://github.com/h4ck3r0/kali-theme
+                                                                  cd ~/kali-theme ; bash os.sh
+                                                                  }
     
-                                            echo -e -n "\e[1;96m Choose\e[1;96m Option : \e[0m"
+                                           
+                                           echo -e -n "\e[1;96m Choose\e[1;96m Option : \e[0m"
                                             read a
                                             case $a in
                                             1) 1line ;;
