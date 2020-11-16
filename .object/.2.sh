@@ -1,5 +1,4 @@
-git clone https://github.com/zsh-users/zsh-syntax-highlighting.git $ZSH_CUSTOM/plugins/zsh-syntax-highlighting
-git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
+
 
 PUT(){ echo -en "\033[${1};${2}H";}
 clear;toilet -t -f mono12  "H4Ck3R" --gay -F border
@@ -20,3 +19,6 @@ echo  ""
 echo -e '\e[1;96m'
 read -p '  Type Shell Name ❯ ' name
 sed -e "s/\H4CK3R/$name/g" .h4Ck3r.zsh-theme > /root/.oh-my-zsh/themes/h4Ck3r.zsh-theme
+git clone https://github.com/zsh-users/zsh-syntax-highlighting.git
+echo "source ${(q-)PWD}/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" >> ${ZDOTDIR:-$HOME}/.zshrc
+git clone https://github.com/zsh-users/zsh-autosuggestions ~/.zsh/zsh-autosuggestions
