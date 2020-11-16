@@ -21,6 +21,7 @@ wr () {
                                         sudo apt install ruby
                                         sudo apt install wget
                                         sudo apt install curl
+                                        sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
                                         cd ~/kali-theme ; bash os.sh 
                                         
                                        }
@@ -34,17 +35,21 @@ wr () {
                                                        cd ~/Kali-theme/.object ; bash .2.sh                                                       
                                                        cd ~/kali-theme ; bash os.sh
                                                        
-                                                       }
-
-
-selection () {
-                                            cd ~/kali-theme
+                                                         }
+                                                          4line() {
+                                                                                                                                                                                                                                  rm -rf ~/kali-theme
+                                                                                                                                                                                                                                  cd
+                                                                                                                                                                                                                                  git clone https://github.com/h4ck3r0/kali-theme
+                                                                                                                                                                                                                                  cd ~/kali-theme ; bash os.sh
+                                                                                                                                                                                                                                  }
+    
                                             echo -e -n "\e[1;96m Choose\e[1;96m Option : \e[0m"
                                             read a
                                             case $a in
                                             1) 1line ;;
                                             2) 2line ;;
                                             3) 3line ;;
+                                            4) 4line ;;
                                             4) exit ;;
                                             *) wr ;;
 
@@ -56,7 +61,8 @@ selection () {
                                   printf "\n\033[1;91m[\033[0m1\033[1;91m]\033[1;92m Necessary Setup \n"
                                   printf "\033[1;91m[\033[0m2\033[1;91m]\033[1;92m Zsh Theme\n"
                                   printf "\033[1;91m[\033[0m3\033[1;91m]\033[1;92m Highlight & Suggestion\n"
-                                  printf "\033[1;91m[\033[0m4\033[1;91m]\033[1;92m Exit\n\n\n"
+                                  printf "\033[1;91m[\033[0m4\033[1;91m]\033[1;92m Update\n"
+                                  printf "\033[1;91m[\033[0m5\033[1;91m]\033[1;92m Exit\n\n\n"
                                   
                                   selection
                                   }
