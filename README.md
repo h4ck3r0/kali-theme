@@ -1,5 +1,5 @@
 # kali-theme
-#kali-linux theme installer
+kali-linux theme installer
 
 Pure Easy Installer
 
@@ -23,3 +23,5 @@ git clone https://github.com/h4ck3r0/kali-theme
 cd kali-theme
 
 bash os.sh
+
+Some Credits Goes to Oh My Zsh
