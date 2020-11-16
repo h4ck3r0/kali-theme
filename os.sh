@@ -44,7 +44,8 @@ wr () {
                                                                   }
     
                                            
-                                           echo -e -n "\e[1;96m Choose\e[1;96m Option : \e[0m"
+                                            echo -e -n "\e[1;96m Choose\e[1;96m Option : \e[0m"
+                                            cd ~/kali-theme
                                             read a
                                             case $a in
                                             1) 1line ;;
