@@ -13,7 +13,7 @@ echo ""
 cd ~/kali-theme/.object
 echo -e '\e[1;96m'
 read -p '  Type Banner Name ❯ ' name
-sed -e "s/\PROC/$name/g" .2zshrc > $HOME/.zshrc
+sed -e "s/\PROC/$name/g" .1zshrc > $HOME/.zshrc
 echo  ""
 echo -e '\e[1;96m'
 read -p '  Type Shell Name ❯ ' name
