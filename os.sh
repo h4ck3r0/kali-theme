@@ -26,16 +26,17 @@ wr () {
                                        }
                                        2line() {
                                                 sudo chsh -s zsh
-                                                cd ~/kali-theme ; bash os.sh
                                                 cd ~/Kali-theme/.object
                                                 bash  .1.sh
-                                                 
+
+                                                cd ~/kali-theme ; bash os.sh
                                                }
                                                3line() {
                                                        sudo chsh -s zsh 
-                                                       cd ~/kali-theme ; bash os.sh
                                                        cd ~/Kali-theme/.object
                                                        bash .2.sh
+                                                       cd ~/kali-theme ; bash os.sh
+                                                       
                                                        }
 
 
