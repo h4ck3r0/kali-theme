@@ -1,4 +1,4 @@
-figlet -f mono12 "H4CK3R" | lolcat
+figlet -f mono12 "PROC" | lolcat
 #echo ""
 ZSH_THEME="h4Ck3r"
 export ZSH=$HOME/.oh-my-zsh
