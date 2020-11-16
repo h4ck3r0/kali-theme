@@ -1,0 +1,4 @@
+
+#echo ""
+ZSH_THEME="h4Ck3r"
+export ZSH=$HOME/.oh-my-zsh
