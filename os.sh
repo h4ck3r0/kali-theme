@@ -50,7 +50,7 @@ wr () {
                                             2) 2line ;;
                                             3) 3line ;;
                                             4) 4line ;;
-                                            4) exit ;;
+                                            5) exit ;;
                                             *) wr ;;
 
                                             esac 
