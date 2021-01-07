@@ -16,7 +16,6 @@ wr () {
                                }
                                1line() {
                                         sudo apt update 
-                                        sudo apt upgrade
                                         sudo apt install zsh
                                         sudo apt install ruby
                                         sudo apt install wget
