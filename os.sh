@@ -1,3 +1,4 @@
+sudo apt install toilet 
 sudo apt install figlet
 gem install lolcat
 clear
