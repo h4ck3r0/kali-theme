@@ -45,4 +45,7 @@ cd kali-theme
 
 bash os.sh
 
-Some Credits Goes to Oh My Zsh
+## Credits 
+
+ImgBot
+Oh My Zsh
