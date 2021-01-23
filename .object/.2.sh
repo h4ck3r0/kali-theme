@@ -18,7 +18,7 @@ sed -e "s/\PROC/$name/g" .2zshrc > $HOME/.zshrc
 echo  ""
 echo -e '\e[1;96m'
 read -p '  Type Shell Name ❯ ' name
-sed -e "s/\H4CK3R/$name/g" .h4Ck3r.zsh-theme > /root/.oh-my-zsh/themes/h4Ck3r.zsh-theme
+sed -e "s/\H4CK3R/$name/g" .h4Ck3r.zsh-theme > /.oh-my-zsh/themes/h4Ck3r.zsh-theme
 git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ~/.zsh/zsh-autosuggestions
 echo "source ${(q-)PWD}/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" >> ${ZDOTDIR:-$HOME}/.zshrc
 git clone https://github.com/zsh-users/zsh-autosuggestions ~/.zsh/zsh-autosuggestions
