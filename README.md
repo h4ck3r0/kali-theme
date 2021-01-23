@@ -20,7 +20,7 @@
 
 
 
-kali-linux theme installer
+kali-linux Theme Installer
 
 Pure Easy Installer
 
@@ -46,6 +46,8 @@ cd kali-theme
 bash os.sh
 
 ## Credits 
+
+Zsh
 
 ImgBot
 
