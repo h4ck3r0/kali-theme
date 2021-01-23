@@ -31,7 +31,7 @@ Pure Easy Installer
 Added Banner With Pure Theme ( made by H4ck3r ~ Raj Aryan )
 
 <p align="center">
-  <img src="2.jpg" width="300" hight="220">
+  <img src="3.PNG" width="300" hight="220">
 </p>
 
 
