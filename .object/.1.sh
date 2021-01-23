@@ -17,4 +17,4 @@ sed -e "s/\PROC/$name/g" .1zshrc > $HOME/.zshrc
 echo  ""
 echo -e '\e[1;96m'
 read -p '  Type Shell Name ❯ ' name
-sed -e "s/\H4CK3R/$name/g" .h4Ck3r.zsh-theme > /root/.oh-my-zsh/themes/h4Ck3r.zsh-theme
+sed -e "s/\H4CK3R/$name/g" .h4Ck3r.zsh-theme > ~/.oh-my-zsh/themes/h4Ck3r.zsh-theme
