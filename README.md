@@ -25,13 +25,13 @@ kali-linux theme installer
 Pure Easy Installer
 
 <p align="center">
-  <img src="1.jpg" width="300" hight="220">
+  <img src="3.PNG" width="300" hight="220">
 </p>
 
 Added Banner With Pure Theme ( made by H4ck3r ~ Raj Aryan )
 
 <p align="center">
-  <img src="3.PNG" width="300" hight="220">
+  <img src="2.PNG" width="300" hight="220">
 </p>
 
 
