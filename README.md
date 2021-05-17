@@ -20,9 +20,10 @@
 
 
 
-kali-linux Theme Installer
+ kali-linux Theme Installer
 
-Pure Easy Installer
+ Pure Easy Installer
+
 
 <p align="center">
   <img src="3.PNG" width="300" hight="220">
