@@ -7,7 +7,7 @@ banner() {
 
  figlet -f mono12 "kali-TH" | lolcat
  echo""
- echo -e "\e[1;31m  [\e[32m√\e[31m] \e[1;91m by \e[1;36mRaj Aryan \e[93m/ \e[100;92 Youtube/H4Ck3R\e[0m"
+ echo -e "\e[1;31m  [\e[32m√\e[31m] \e[1;91m by \e[1;36mRaj Aryan \e[93m/ \e[100;92m Youtube/H4Ck3R\e[0m"
 
                   }
 wr () {
