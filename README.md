@@ -14,6 +14,13 @@
 <a href="https://youtu.be/VDeLnDxVziw"><img title="YouTube" src="https://img.shields.io/badge/YouTube-H4CK3R-red?style=for-the-badge&logo=Youtube"></a>
 </p>
 
+<p align="center">
+<a href="https://github.com/h4ck3r0"><img title="Language" src="https://img.shields.io/badge/Made%20with-Bash-1f425f.svg?v=103"></a>
+<a href="https://github.com/h4ck3r0"><img title="Followers" src="https://img.shields.io/github/followers/h4ck3r0?color=blue&style=flat-square"></a>
+<a href="https://github.com/h4ck3r0"><img title="Stars" src="https://img.shields.io/github/stars/h4ck3r0/kali-theme?color=red&style=flat-square"></a>
+<a href="https://github.com/h4ck3r0"><img title="Forks" src="https://img.shields.io/github/forks/h4ck3r0/kali-theme?color=red&style=flat-square"></a>
+<a href="https://github.com/h4ck3r0"><img title="Watching" src="https://img.shields.io/github/watchers/h4ck3r0/kali-theme?label=Watchers&color=blue&style=flat-square"></a>
+<a href="https://github.com/h4ck3r0"><img title="Licence" src="https://img.shields.io/badge/License-GNU-blue.svg"></a>
 </p>
 
 ## kali-theme
@@ -40,16 +47,28 @@ Added Banner With Pure Theme ( made by H4ck3r ~ Raj Aryan )
 
 
 
-git clone https://github.com/h4ck3r0/kali-theme
+`* [+] git clone https://github.com/h4ck3r0/kali-theme`
 
-cd kali-theme
+`* [+] cd kali-theme`
 
-bash os.sh
+`* [+] bash os.sh`
+
 
 ## Credits 
 
-Zsh
+```
+* Zsh
 
-ImgBot
+* ImgBot
 
-Oh My Zsh
+* Oh My Zsh
+```
+
+
+## CONNECT WITH US :
+
+<a href="https://github.com/h4ck3r0"><img title="Github" src="https://img.shields.io/badge/H4Ck3R-Raj-brightgreen?style=for-the-badge&logo=github"></a>
+[![Instagram](https://img.shields.io/badge/INSTAGRAM-FOLLOW-red?style=for-the-badge&logo=instagram)](https://rebrand.ly/loginx202266fb40)
+[![Instagram](https://img.shields.io/badge/WEBSITE-VISIT-yellow?style=for-the-badge&logo=blogger)](https://rebrand.ly/h4ck3r-5064aa)
+[![Instagram](https://img.shields.io/badge/TELEGRAM-CHANNEL-red?style=for-the-badge&logo=telegram)](https://rebrand.ly/termuxcoding3d8527)
+<a href="https://rebrand.ly/7elzgww"><img title="YouTube" src="https://img.shields.io/badge/YouTube-H4Ck3R-red?style=for-the-badge&logo=Youtube"></a>
