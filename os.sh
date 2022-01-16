@@ -37,11 +37,18 @@ wr () {
                                                        
                                                          }
                                                           4line() {
-                                                                  rm -rf ~/kali-theme
-                                                                  cd
-                                                                  git clone https://github.com/h4ck3r0/kali-theme
+                                                                  rm -r ~/.zshrc
+                                                                  cd ~/kali-Theme/.object
+                                                                  cp  -r .zshrc ~/.zshrc
                                                                   cd ~/kali-theme ; bash os.sh
                                                                   }
+                                                                  5line() {                                                                  
+                                                                            rm -rf ~/kali-theme
+                                                                            cd
+                                                                            git clone https://github.com/h4ck3r0/kali-theme
+                                                                            cd ~/kali-theme ; bash os.sh
+       
+                                                                  
     selection () {
                                            
                                             echo -e -n "\e[1;96m Choose\e[1;96m Option : \e[0m"
@@ -52,7 +59,8 @@ wr () {
                                             2) 2line ;;
                                             3) 3line ;;
                                             4) 4line ;;
-                                            5) exit ;;
+                                            5) 5line  ;;
+                                            6) exit ;;
                                             *) wr ;;
 
                                             esac 
@@ -63,8 +71,9 @@ wr () {
                                   printf "\n\033[1;91m[\033[0m1\033[1;91m]\033[1;92m Necessary Setup \n"
                                   printf "\033[1;91m[\033[0m2\033[1;91m]\033[1;92m Zsh Theme\n"
                                   printf "\033[1;91m[\033[0m3\033[1;91m]\033[1;92m Highlight & Suggestion\n"
-                                  printf "\033[1;91m[\033[0m4\033[1;91m]\033[1;92m Update\n"
-                                  printf "\033[1;91m[\033[0m5\033[1;91m]\033[1;92m Exit\n\n\n"
+                                  printf "\033[1;91m[\033[0m4\033[1;91m]\033[1;92m Reset Theme\n"
+                                  printf "\033[1;91m[\033[0m5\033[1;91m]\033[1;92m Update\n"
+                                  printf "\033[1;91m[\033[0m6\033[1;91m]\033[1;92m Exit\n\n\n"
                                   
                                   selection
                                   }
