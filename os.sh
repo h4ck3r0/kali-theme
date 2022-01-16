@@ -48,7 +48,7 @@ wr () {
                                                                             git clone https://github.com/h4ck3r0/kali-theme
                                                                             cd ~/kali-theme ; bash os.sh
        
-                                                                  
+                                                                  }
     selection () {
                                            
                                             echo -e -n "\e[1;96m Choose\e[1;96m Option : \e[0m"
