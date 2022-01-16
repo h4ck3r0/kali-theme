@@ -39,8 +39,9 @@ wr () {
                                                          }
                                                           4line() {
                                                                   rm -r ~/.zshrc
-                                                                  cd ~/kali-Theme/.object
+                                                                  cd ~/kali-theme/.object
                                                                   cp  -r .zshrc ~/.zshrc
+                                                                  
                                                                   cd ~/kali-theme ; bash os.sh
                                                                   }
                                                                   5line() {                                                                  
