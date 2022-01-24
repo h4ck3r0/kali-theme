@@ -39,7 +39,7 @@
 Added Banner With Pure Theme ( made by H4ck3r ~ Raj Aryan )
 
 <p align="center">
-  <img src="2.PNG" width="300" hight="220">
+  <img src="https://user-images.githubusercontent.com/46929618/150728320-e559415f-2433-475b-8534-e51d294f42de.png" width="300" hight="220">
 </p>
 
 
