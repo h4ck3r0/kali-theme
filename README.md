@@ -7,7 +7,7 @@
 <a href="https://h4ck3r0.github.io/"><img title="Maintainence" src="https://img.shields.io/badge/Maintained%3F-yes-green.svg"></a>
 </p>
 <p align="center">
- <a href=""><img src="4.png" width="1000" hight="200"></a>
+ <a href=""><img src="https://user-images.githubusercontent.com/46929618/150728456-fa598cb6-3112-4b04-bfc6-e85b1af0ad7f.png" width="1000" hight="200"></a>
 </p>
 <p align="center">
 <a href="https://github.com/h4ck3r0"><img title="Github" src="https://img.shields.io/badge/H4CK3R-RAJ-brightgreen?style=for-the-badge&logo=github"></a>
@@ -33,7 +33,7 @@
 
 
 <p align="center">
-  <img src="3.PNG" width="300" hight="220">
+  <img src="https://user-images.githubusercontent.com/46929618/150728439-857011e4-2b1c-44ed-a388-24606b8aa684.png" width="300" hight="220">
 </p>
 
 Added Banner With Pure Theme ( made by H4ck3r ~ Raj Aryan )
