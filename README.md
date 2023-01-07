@@ -2,9 +2,9 @@
 <a href="https://h4ck3r0.github.io/"><img title="Made in INDIA" src="https://img.shields.io/badge/MADE%20IN-INDIA-SCRIPT?colorA=%23ff8100&colorB=%23017e40&colorC=%23ff0000&style=for-the-badge"></a>
 </p>
 <p align="center">
-<a href="https://h4ck3r0.github.io/"><img title="Made in INDIA" src="https://img.shields.io/badge/Tool-KaliTheme-green.svg"></a>
+<a href="https://h4ck3r0.github.io/"><img title="Made in INDIA" src="https://img.shields.io/badge/Tool-KaliTheme-green.svg?style=flat-square"></a>
 <a href="https://h4ck3r0.github.io/"><img title="Version" src="https://img.shields.io/badge/Version-1.0-green.svg?style=flat-square"></a>
-<a href="https://h4ck3r0.github.io/"><img title="Maintainence" src="https://img.shields.io/badge/Maintained%3F-yes-green.svg"></a>
+<a href="https://h4ck3r0.github.io/"><img title="Maintainence" src="https://img.shields.io/badge/Maintained%3F-yes-green.svg?style=flat-square"></a>
 </p>
 <p align="center">
  <a href=""><img src="https://user-images.githubusercontent.com/46929618/150728456-fa598cb6-3112-4b04-bfc6-e85b1af0ad7f.png" width="1000" hight="200"></a>
@@ -15,12 +15,12 @@
 </p>
 
 <p align="center">
-<a href="https://github.com/h4ck3r0"><img title="Language" src="https://img.shields.io/badge/Made%20with-Bash-1f425f.svg?v=103"></a>
+<a href="https://github.com/h4ck3r0"><img title="Language" src="https://img.shields.io/badge/Made%20with-Bash-1f425f.svg?v=103&style=flat-square"></a>
 <a href="https://github.com/h4ck3r0"><img title="Followers" src="https://img.shields.io/github/followers/h4ck3r0?color=blue&style=flat-square"></a>
 <a href="https://github.com/h4ck3r0"><img title="Stars" src="https://img.shields.io/github/stars/h4ck3r0/kali-theme?color=red&style=flat-square"></a>
 <a href="https://github.com/h4ck3r0"><img title="Forks" src="https://img.shields.io/github/forks/h4ck3r0/kali-theme?color=red&style=flat-square"></a>
 <a href="https://github.com/h4ck3r0"><img title="Watching" src="https://img.shields.io/github/watchers/h4ck3r0/kali-theme?label=Watchers&color=blue&style=flat-square"></a>
-<a href="https://github.com/h4ck3r0"><img title="Licence" src="https://img.shields.io/badge/License-GNU-blue.svg"></a>
+<a href="https://github.com/h4ck3r0"><img title="Licence" src="https://img.shields.io/badge/License-GNU-blue.svg?style=flat-square"></a>
 </p>
 
 ## kali-theme
