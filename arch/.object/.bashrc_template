@@ -1,0 +1,45 @@
+# ~/.bashrc file for Arch Linux - Customized by H4CK3R
+
+# If not running interactively, don't do anything
+[[ $- != *i* ]] && return
+
+# Basic Settings
+HISTCONTROL=ignoreboth
+shopt -s histappend
+HISTSIZE=10000
+HISTFILESIZE=20000
+
+# Color definition
+C_CYAN='\[\e[1;36m\]'
+C_BLUE='\[\e[1;34m\]'
+C_GREEN='\[\e[1;32m\]'
+C_WHITE='\[\e[1;37m\]'
+C_RESET='\[\e[0m\]'
+
+# Custom Bash Prompt
+# ┌─[󰣇 name@ARCH]-[~/path]
+# └─╼ ❯❯❯
+export PS1="\n${C_CYAN}┌─[${C_BLUE}󰣇 PROC${C_CYAN}@${C_BLUE}ARCH${C_CYAN}]-[${C_GREEN}\w${C_CYAN}]\n└─╼ ${C_CYAN}❯${C_BLUE}❯${C_WHITE}❯ ${C_RESET}"
+
+# Aliases
+alias ls='ls --color=auto'
+alias la='ls -A'
+alias ll='ls -lh'
+alias grep='grep --color=auto'
+alias pacupd='sudo pacman -Syu'
+alias pacinst='sudo pacman -S'
+alias pacrem='sudo pacman -Rns'
+
+# Interactive Thumbnail / Fastfetch Banner
+if [ -x "$(command -v fastfetch)" ]; then
+    if [ -f "$HOME/.config/fastfetch/config.jsonc" ]; then
+        fastfetch --config "$HOME/.config/fastfetch/config.jsonc"
+    else
+        fastfetch
+    fi
+else
+    # Simple ASCII Art fallback if fastfetch is missing
+    echo -e "\e[1;36m  /\  \e[0m"
+    echo -e "\e[1;36m /  \ \e[1;37m  Arch Linux\e[0m"
+    echo -e "\e[1;36m/ _ _ \ \e[0m"
+fi
