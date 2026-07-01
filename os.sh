@@ -227,8 +227,52 @@ install_nerd_fonts() {
     echo -e "${G} [*] Rebuilding font cache...${RS}"
     fc-cache -fv &>/dev/null || $SUDO_CMD fc-cache -fv &>/dev/null
 
-    echo -e "${G} [✓] Nerd Font installed! Set your terminal font in your emulator settings.${RS}"
-    sleep 3
+    echo -e "${G} [✓] Nerd Font files installed!${RS}"
+    
+    # Detect terminal emulator and give instructions
+    TERM_EMULATOR="generic"
+    if [ -n "$QTERMINAL_IPC" ]; then
+        TERM_EMULATOR="qterminal"
+    elif [ -n "$GNOME_TERMINAL_SCREEN" ]; then
+        TERM_EMULATOR="gnome-terminal"
+    elif [ "$TERM" = "xterm-kitty" ]; then
+        TERM_EMULATOR="kitty"
+    elif [ "$TERM" = "alacritty" ]; then
+        TERM_EMULATOR="alacritty"
+    fi
+
+    echo -e "\n${Y} [!] HOW TO SET THE FONT IN YOUR TERMINAL:${RS}"
+    case "$TERM_EMULATOR" in
+        "qterminal")
+            echo -e "   1. Click ${C}File${RS} in the menu bar."
+            echo -e "   2. Go to ${C}Preferences${RS} -> ${C}Appearance${RS}."
+            echo -e "   3. Click ${C}Change${RS} next to 'Font'."
+            echo -e "   4. Choose ${G}JetBrainsMono Nerd Font${RS} (or Hack Nerd Font) and Save."
+            ;;
+        "gnome-terminal")
+            echo -e "   1. Click the ${C}Menu (3 bars)${RS} in the top-right."
+            echo -e "   2. Go to ${C}Preferences${RS}."
+            echo -e "   3. Under Profiles, click your profile (e.g. Unnamed)."
+            echo -e "   4. Check ${C}Custom font${RS}."
+            echo -e "   5. Choose ${G}JetBrainsMono Nerd Font${RS} and click Select."
+            ;;
+        "kitty")
+            echo -e "   Add this to your ${C}~/.config/kitty/kitty.conf${RS}:"
+            echo -e "   ${G}font_family JetBrainsMono Nerd Font${RS}"
+            ;;
+        "alacritty")
+            echo -e "   Update your ${C}~/.config/alacritty/alacritty.toml${RS}:"
+            echo -e "   ${G}[font.normal]"
+            echo -e "   family = \"JetBrainsMono Nerd Font\"${RS}"
+            ;;
+        *)
+            echo -e "   1. Open your terminal emulator's ${C}Settings/Preferences${RS}."
+            echo -e "   2. Navigate to ${C}Appearance / Font${RS} settings."
+            echo -e "   3. Change the font to ${G}JetBrainsMono Nerd Font${RS}."
+            ;;
+    esac
+    echo -e ""
+    read -n 1 -s -r -p " Press any key to return to menu... "
     menu
 }
 
@@ -276,9 +320,25 @@ success_symbol = "[ ❯ ](bold fg:#769ff0 bg:#394260)"
 error_symbol = "[ ✗ ](bold fg:#e06c75 bg:#394260)"
 EOF
 
-    echo -e "${G} [✓] Starship prompt configured! To activate, add this to your shell RC file:${RS}"
-    echo -e "     Zsh  -> ${C}eval \"\$(starship init zsh)\"${RS}"
-    echo -e "     Bash -> ${C}eval \"\$(starship init bash)\"${RS}"
+    echo -e "${G} [✓] Starship prompt configured!${RS}"
+    
+    # Auto-activate Starship in .zshrc
+    if [ -f "$HOME/.zshrc" ]; then
+        if ! grep -q "starship init zsh" "$HOME/.zshrc"; then
+            echo -e "${G} [*] Activating Starship in your .zshrc...${RS}"
+            echo 'eval "$(starship init zsh)"' >> "$HOME/.zshrc"
+        fi
+    fi
+
+    # Auto-activate Starship in .bashrc
+    if [ -f "$HOME/.bashrc" ]; then
+        if ! grep -q "starship init bash" "$HOME/.bashrc"; then
+            echo -e "${G} [*] Activating Starship in your .bashrc...${RS}"
+            echo 'eval "$(starship init bash)"' >> "$HOME/.bashrc"
+        fi
+    fi
+
+    echo -e "${G} [✓] Starship successfully enabled and configured! Reload your shell (e.g. run 'zsh') to see it.${RS}"
     sleep 4
     menu
 }
