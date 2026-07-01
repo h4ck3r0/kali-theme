@@ -410,7 +410,28 @@ menu() {
     esac
 }
 
+# Check for updates on startup
+check_for_updates() {
+    if [ -d "$SCRIPT_DIR/.git" ] && command -v git &>/dev/null; then
+        echo -e "${G} [*] Checking for updates...${RS}"
+        # Timeout after 3 seconds to avoid hanging if user is offline
+        timeout 3 git fetch --quiet &>/dev/null
+        
+        LOCAL=$(git rev-parse HEAD 2>/dev/null)
+        UPSTREAM=$(git rev-parse @{u} 2>/dev/null)
+        
+        if [ "$LOCAL" != "$UPSTREAM" ] && [ -n "$UPSTREAM" ]; then
+            echo -e "${Y}\n [!] A new update is available for this tool!${RS}"
+            read -p " Do you want to update now? [y/N]: " confirm_update
+            if [[ "$confirm_update" =~ ^[Yy]$ ]]; then
+                update_tool
+            fi
+        fi
+    fi
+}
+
 # Entry Point
 check_kali
+check_for_updates
 menu
 
