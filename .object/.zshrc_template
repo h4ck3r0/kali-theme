@@ -1,4 +1,4 @@
-# ~/.zshrc file for Arch Linux - Customized by H4CK3R
+# ~/.zshrc file for Kali Linux - Customized by H4CK3R
 
 # Basic Shell Options
 setopt autocd              # Change directory just by typing its name
@@ -25,37 +25,34 @@ export SHELL_NAME="PROC"
 # Oh-My-Zsh Integration
 if [ -d "$HOME/.oh-my-zsh" ]; then
     export ZSH="$HOME/.oh-my-zsh"
-    ZSH_THEME="h4Ck3r_arch"
+    ZSH_THEME="h4Ck3r"
     plugins=(git zsh-syntax-highlighting zsh-autosuggestions)
     source $ZSH/oh-my-zsh.sh
 else
     # Standalone prompt and theme loading
-    if [ -f "$HOME/.zsh/themes/h4Ck3r_arch.zsh-theme" ]; then
-        source "$HOME/.zsh/themes/h4Ck3r_arch.zsh-theme"
+    if [ -f "$HOME/.zsh/themes/h4Ck3r.zsh-theme" ]; then
+        source "$HOME/.zsh/themes/h4Ck3r.zsh-theme"
     else
-        PROMPT='%F{cyan}%n@%m %F{blue}%~ %F{yellow}❯ %f'
+        PROMPT='%F{blue}%n@%m %F{red}%~ %F{yellow}❯ %f'
     fi
 fi
 
 # Load Syntax Highlighting and Autosuggestions if not loaded by Oh-My-Zsh
-# Arch path for system plugins:
-# /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-# /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
-# Also check user directories:
-# $HOME/.zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-# $HOME/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
+# Debian/Kali paths for system plugins:
+# /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+# /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh
 
 if [[ ! " ${plugins[*]} " =~ " zsh-syntax-highlighting " ]]; then
-    if [ -f /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]; then
-        source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+    if [ -f /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]; then
+        source /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
     elif [ -f "$HOME/.zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ]; then
         source "$HOME/.zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
     fi
 fi
 
 if [[ ! " ${plugins[*]} " =~ " zsh-autosuggestions " ]]; then
-    if [ -f /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh ]; then
-        source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
+    if [ -f /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh ]; then
+        source /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh
         ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=#666'
     elif [ -f "$HOME/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh" ]; then
         source "$HOME/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh"
@@ -68,9 +65,9 @@ alias ls='ls --color=auto'
 alias la='ls -A'
 alias ll='ls -lh'
 alias grep='grep --color=auto'
-alias pacupd='sudo pacman -Syu'
-alias pacinst='sudo pacman -S'
-alias pacrem='sudo pacman -Rns'
+alias aptupd='sudo apt update && sudo apt upgrade -y'
+alias aptinst='sudo apt install -y'
+alias aptrem='sudo apt remove --purge -y && sudo apt autoremove -y'
 
 # Interactive Thumbnail / Fastfetch Banner
 if [ -x "$(command -v fastfetch)" ]; then
@@ -81,7 +78,8 @@ if [ -x "$(command -v fastfetch)" ]; then
     fi
 else
     # Simple ASCII Art fallback if fastfetch is missing
-    echo -e "\e[1;36m  /\  \e[0m"
-    echo -e "\e[1;36m /  \ \e[1;37m  Arch Linux\e[0m"
-    echo -e "\e[1;36m/ _ _ \ \e[0m"
+    echo -e "\e[1;34m  / \__\e[0m"
+    echo -e "\e[1;34m (    @\___ \e[1;37m  Kali Linux\e[0m"
+    echo -e "\e[1;34m /         O\e[0m"
+    echo -e "\e[1;34m/   (_____/\e[0m"
 fi
