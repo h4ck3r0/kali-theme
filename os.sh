@@ -295,7 +295,6 @@ $character'''
 [username]
 show_always = true
 style_user = "bold white"
-style_system = "bold white"
 format = "$user"
 
 [hostname]
