@@ -391,7 +391,6 @@ menu() {
     printf " ${B}[${W}05${B}]${C} Install Custom Nerd Fonts\n"
     printf " ${B}[${W}06${B}]${C} Install Starship Prompt Preset\n"
     printf " ${B}[${W}07${B}]${Y} Reset Shell Configuration\n"
-    printf " ${B}[${W}08${B}]${C} Update Customizer Tool\n"
     printf " ${B}[${W}00${B}]${R} Exit Script\n"
     echo -e ""
     echo -ne "${B} kali-th${W}@${R}root${W}:${C}~${RS}# "
@@ -404,7 +403,6 @@ menu() {
         5|05) install_nerd_fonts ;;
         6|06) install_starship ;;
         7|07) reset_config ;;
-        8|08) update_tool ;;
         0|00) exit ;;
         *) wr ;;
     esac
