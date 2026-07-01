@@ -288,9 +288,9 @@ install_starship() {
     mkdir -p "$HOME/.config"
     cat << 'EOF' > "$HOME/.config/starship.toml"
 # Custom Starship Config by H4CK3R - Matches Custom Theme Design
-format = """
+format = '''
 [┌─\[](bold blue)[㉿ ](bold red)$username[@](bold blue)$hostname[\]-\[](bold blue)$directory[\]](bold blue)$git_branch$git_status
-$character"""
+$character'''
 
 [username]
 show_always = true
@@ -312,7 +312,7 @@ truncation_symbol = "…/"
 [git_branch]
 symbol = " "
 style = "bold red"
-format = "-\\[[git:(](bold blue)$symbol$branch[)](bold blue)\\]"
+format = '-\[[git:(](bold blue)$symbol$branch[)](bold blue)\]'
 
 [git_status]
 style = "bold red"
