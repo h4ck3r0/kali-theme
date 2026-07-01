@@ -302,6 +302,22 @@ reset_config() {
     menu
 }
 
+# Update Tool
+update_tool() {
+    echo -e "${Y}\n [!] Updating customizer tool...${RS}"
+    if [ -d "$SCRIPT_DIR/.git" ]; then
+        cd "$SCRIPT_DIR"
+        git fetch --all
+        git reset --hard origin/main || git reset --hard origin/master || true
+        git pull
+    else
+        echo -e "${R} [!] Git repository not found. Please manually git pull to update.${RS}"
+    fi
+    echo -e "${G} [✓] Update complete! Reloading script...${RS}"
+    sleep 2
+    exec bash "$0"
+}
+
 # Interactive Menu
 menu() {
     banner
@@ -313,6 +329,7 @@ menu() {
     printf " ${B}[${W}05${B}]${C} Install Custom Nerd Fonts\n"
     printf " ${B}[${W}06${B}]${C} Install Starship Prompt Preset\n"
     printf " ${B}[${W}07${B}]${Y} Reset Shell Configuration\n"
+    printf " ${B}[${W}08${B}]${C} Update Customizer Tool\n"
     printf " ${B}[${W}00${B}]${R} Exit Script\n"
     echo -e ""
     echo -ne "${B} kali-th${W}@${R}root${W}:${C}~${RS}# "
@@ -325,6 +342,7 @@ menu() {
         5|05) install_nerd_fonts ;;
         6|06) install_starship ;;
         7|07) reset_config ;;
+        8|08) update_tool ;;
         0|00) exit ;;
         *) wr ;;
     esac
@@ -333,3 +351,4 @@ menu() {
 # Entry Point
 check_kali
 menu
+

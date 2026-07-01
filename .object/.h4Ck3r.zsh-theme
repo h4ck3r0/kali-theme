@@ -13,14 +13,13 @@ setopt prompt_subst
 zstyle ':vcs_info:git:*' formats '%F{blue}git:(%F{red}%b%F{blue})%r%f'
 zstyle ':vcs_info:git:*' actionformats '%F{blue}git:(%F{red}%b%F{blue}|%F{yellow}%a%F{blue})%r%f'
 
-# Custom Git Prompt Info function compatible with Oh-My-Zsh and standalone Zsh
-git_prompt_info() {
-    if declare -f git_prompt_info > /dev/null; then
-        git_prompt_info
-    else
+# Define git_prompt_info only if not already defined (e.g. by Oh-My-Zsh)
+if ! declare -f git_prompt_info > /dev/null; then
+    git_prompt_info() {
         echo -n "${vcs_info_msg_0_}"
-    fi
-}
+    }
+fi
+
 
 # Main Prompt Layout
 # ┌─[💀 name@KALI]-[~/path] [git status]
