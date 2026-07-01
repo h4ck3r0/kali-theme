@@ -311,7 +311,7 @@ truncation_symbol = "…/"
 [git_branch]
 symbol = " "
 style = "bold red"
-format = '-\[[git:(](bold blue)$symbol$branch[)](bold blue)\]'
+format = '-\[[git:\(](bold blue)$symbol$branch[\)](bold blue)\]'
 
 [git_status]
 style = "bold red"
