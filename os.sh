@@ -287,37 +287,40 @@ install_starship() {
     echo -e "${G} [*] Deploying Starship configuration...${RS}"
     mkdir -p "$HOME/.config"
     cat << 'EOF' > "$HOME/.config/starship.toml"
-# Custom Starship Config by H4CK3R
+# Custom Starship Config by H4CK3R - Matches Custom Theme Design
 format = """
-[░▒▓](#a3aed2)\
-[ ㉿ ](bg:#a3aed2 fg:#090d16)\
-[](deno_blue)\
-$directory\
-[](fg:#e3e5e5 bg:#769ff0)\
-$git_branch\
-$git_status\
-[](fg:#769ff0 bg:#394260)\
-$character\
-"""
+[┌─\[](bold blue)[㉿ ](bold red)$username[@](bold blue)$hostname[\]-\[](bold blue)$directory[\]](bold blue)$git_branch$git_status
+$character"""
+
+[username]
+show_always = true
+style_user = "bold white"
+style_system = "bold white"
+format = "$user"
+
+[hostname]
+ssh_only = false
+style = "bold red"
+format = "$hostname"
 
 [directory]
-style = "bg:#e3e5e5 fg:#090d16"
-format = "[ $path ]($style)"
+style = "bold green"
+format = "$path"
 truncation_length = 3
 truncation_symbol = "…/"
 
 [git_branch]
 symbol = " "
-style = "bg:#769ff0 fg:#090d16"
-format = "[[ $symbol$branch ]($style)]"
+style = "bold red"
+format = "-\\[[git:(](bold blue)$symbol$branch[)](bold blue)\\]"
 
 [git_status]
-style = "bg:#769ff0 fg:#090d16"
-format = "[[$all_status$ahead_behind ]($style)]"
+style = "bold red"
+format = "[$all_status$ahead_behind]($style)"
 
 [character]
-success_symbol = "[ ❯ ](bold fg:#769ff0 bg:#394260)"
-error_symbol = "[ ✗ ](bold fg:#e06c75 bg:#394260)"
+success_symbol = "[└─╼ ](bold blue)[❯❯❯](bold cyan) "
+error_symbol = "[└─╼ ](bold blue)[✗❯❯](bold red) "
 EOF
 
     echo -e "${G} [✓] Starship prompt configured!${RS}"
