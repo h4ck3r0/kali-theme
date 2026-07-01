@@ -10,6 +10,7 @@ RS='\033[0m'
 
 clear
 SUDO_CMD=$(command -v sudo)
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 banner() {
     clear
@@ -30,33 +31,45 @@ wr() {
     $SUDO_CMD apt update && $SUDO_CMD apt upgrade -y
     $SUDO_CMD apt install zsh ruby wget curl git figlet toilet -y
     sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
-    cd ~/kali-theme && bash os.sh
+    cd "$SCRIPT_DIR" && bash os.sh
 }
 
 2line() {
-    [ -d ~/kali-theme/.object ] && cd ~/kali-theme/.object && bash .1.sh
+    [ -d "$SCRIPT_DIR/.object" ] && cd "$SCRIPT_DIR/.object" && bash .1.sh
     $SUDO_CMD chsh -s $(command -v zsh) $USER
     sleep 2
-    cd ~/kali-theme && bash os.sh
+    cd "$SCRIPT_DIR" && bash os.sh
 }
 
 3line() {
-    [ -d ~/kali-theme/.object ] && cd ~/kali-theme/.object && bash .2.sh
+    [ -d "$SCRIPT_DIR/.object" ] && cd "$SCRIPT_DIR/.object" && bash .2.sh
     sleep 2
-    cd ~/kali-theme && bash os.sh
+    cd "$SCRIPT_DIR" && bash os.sh
 }
 
 4line() {
-    rm -rf ~/.zshrc
-    [ -f ~/kali-theme/.object/.zshrc ] && cp ~/kali-theme/.object/.zshrc ~/.zshrc
+    rm -rf "$HOME/.zshrc"
+    [ -f "$SCRIPT_DIR/.object/.zshrc" ] && cp "$SCRIPT_DIR/.object/.zshrc" "$HOME/.zshrc"
     sleep 2
-    cd ~/kali-theme && bash os.sh
+    cd "$SCRIPT_DIR" && bash os.sh
 }
 
 5line() {
-    cd ~ && rm -rf kali-theme
-    git clone https://github.com/h4ck3r0/kali-theme
-    cd ~/kali-theme && bash os.sh
+    echo -e "${Y}\n [!] Updating Kali-TH script...${RS}"
+    if [ -d "$SCRIPT_DIR/.git" ]; then
+        cd "$SCRIPT_DIR"
+        git fetch --all
+        git reset --hard origin/main || git reset --hard origin/master || true
+        git pull
+    else
+        PARENT_DIR="$(dirname "$SCRIPT_DIR")"
+        DIR_NAME="$(basename "$SCRIPT_DIR")"
+        GIT_URL=$(git config --get remote.origin.url 2>/dev/null || echo "https://github.com/h4ck3r0/kali-theme")
+        cd "$PARENT_DIR"
+        rm -rf "$DIR_NAME"
+        git clone "$GIT_URL" "$DIR_NAME"
+    fi
+    cd "$SCRIPT_DIR" && bash os.sh
 }
 
 menu() {
@@ -82,7 +95,7 @@ menu() {
     esac
 }
 
-if [[ $(basename "$PWD") != "kali-theme" ]]; then
-    cd ~/kali-theme 2>/dev/null
+if [[ "$PWD" != "$SCRIPT_DIR" ]]; then
+    cd "$SCRIPT_DIR" 2>/dev/null
 fi
 menu

@@ -1,4 +1,4 @@
-
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 PUT(){ echo -en "\033[${1};${2}H";}
 clear;toilet -t -f mono12  "H4Ck3R" --gay -F border
@@ -11,14 +11,26 @@ echo -e "\e[1;31m  [\e[32m√\e[31m] \e[1;91m by \e[1;36mRaj Aryan \e[93m/ \e[10
 echo
 echo -e "  \e[101;1;39mNOTE\e[0;1;33m Use upto 9 words\e[0m"
 echo ""
-cd ~/kali-theme/.object
+cd "$SCRIPT_DIR"
 echo -e '\e[1;96m'
 read -p '  Type Banner Name ❯ ' name
 sed -e "s/\PROC/$name/g" .2zshrc > $HOME/.zshrc
 echo  ""
 echo -e '\e[1;96m'
 read -p '  Type Shell Name ❯ ' name
-sed -e "s/\H4CK3R/$name/g" .h4Ck3r.zsh-theme > ~/.oh-my-zsh/themes/h4Ck3r.zsh-theme
-git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ~/.zsh/zsh-syntax-highlighting
-echo "source ${(q-)PWD}/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" >> ${ZDOTDIR:-$HOME}/.zshrc
-git clone https://github.com/zsh-users/zsh-autosuggestions ~/.zsh/zsh-autosuggestions
+ZSH_DIR="${ZSH:-$HOME/.oh-my-zsh}"
+mkdir -p "$ZSH_DIR/themes"
+sed -e "s/\H4CK3R/$name/g" .h4Ck3r.zsh-theme > "$ZSH_DIR/themes/h4Ck3r.zsh-theme"
+
+mkdir -p "$HOME/.zsh"
+if [ ! -d "$HOME/.zsh/zsh-syntax-highlighting" ]; then
+    git clone https://github.com/zsh-users/zsh-syntax-highlighting.git "$HOME/.zsh/zsh-syntax-highlighting"
+else
+    cd "$HOME/.zsh/zsh-syntax-highlighting" && git pull && cd "$SCRIPT_DIR"
+fi
+
+if [ ! -d "$HOME/.zsh/zsh-autosuggestions" ]; then
+    git clone https://github.com/zsh-users/zsh-autosuggestions "$HOME/.zsh/zsh-autosuggestions"
+else
+    cd "$HOME/.zsh/zsh-autosuggestions" && git pull && cd "$SCRIPT_DIR"
+fi
