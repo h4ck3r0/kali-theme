@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Kali Linux Shell Customizer (Kali-TH)
-# Created by Antigravity / Raj Aryan (H4CK3R)
+# Created by Raj Aryan (H4CK3R)
 
 # Color variables
 R='\033[1;31m'
