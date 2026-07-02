@@ -25,7 +25,7 @@ fi
 # ┌─[💀 name@KALI]-[~/path] [git status]
 # └─╼ ❯❯❯
 PROMPT="
-%F{blue}┌─%F{blue}[%F{red}㉿ %B\${SHELL_NAME:-H4CK3R}%b%F{blue}@%B%F{red}KALI%b%F{blue}]%F{blue}-%F{blue}[%B%F{green}%~%b%F{blue}]%f \$(git_prompt_info)
+%F{blue}┌─%F{blue}[%F{red}㉿%B\${SHELL_NAME:-H4CK3R}%b%F{blue}@%B%F{red}KALI%b%F{blue}]%F{blue}-%F{blue}[%B%F{green}%~%b%F{blue}]%f \$(git_prompt_info)
 %F{blue}└─╼ %B%F{blue}❯%F{red}❯%F{white}❯ %f%b"
 
 # Git Prompt configuration for Oh-My-Zsh (used if OMZ is loaded)
