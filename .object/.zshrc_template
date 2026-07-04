@@ -74,7 +74,7 @@ alias aptrem='sudo apt remove --purge -y && sudo apt autoremove -y'
 if [ -f "$HOME/.archify-banner.sh" ]; then
     bash "$HOME/.archify-banner.sh"
 else
-    if [ -x "$(command -v fastfetch)" ]; then
+    if command -v fastfetch &>/dev/null; then
         if [ -f "$HOME/.config/fastfetch/config.jsonc" ]; then
             fastfetch --config "$HOME/.config/fastfetch/config.jsonc"
         else

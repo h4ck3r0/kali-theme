@@ -17,6 +17,26 @@ clear
 SUDO_CMD=$(command -v sudo)
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+# Determine Target User and Home Directory
+if [ -n "$SUDO_USER" ] && [ "$SUDO_USER" != "root" ]; then
+    TARGET_USER="$SUDO_USER"
+    TARGET_HOME=$(getent passwd "$SUDO_USER" | cut -d: -f6)
+else
+    TARGET_USER="$(whoami)"
+    TARGET_HOME="$HOME"
+fi
+
+# Ownership Correction Helper
+adjust_ownership() {
+    if [ "$TARGET_USER" != "$(whoami)" ] && [ -n "$TARGET_USER" ]; then
+        for file in "$@"; do
+            if [ -e "$file" ]; then
+                chown -R "$TARGET_USER:$TARGET_USER" "$file" 2>/dev/null || true
+            fi
+        done
+    fi
+}
+
 # Ensure we're in the script directory
 cd "$SCRIPT_DIR" 2>/dev/null
 
@@ -92,44 +112,50 @@ apply_zsh_theme() {
     custom_name=${custom_name:-H4CK3R}
 
     # Oh-My-Zsh Installation Check
-    if [ ! -d "$HOME/.oh-my-zsh" ]; then
+    if [ ! -d "$TARGET_HOME/.oh-my-zsh" ]; then
         read -p " Oh My Zsh is not installed. Install it now? [y/N]: " inst_omz
         if [[ "$inst_omz" =~ ^[Yy]$ ]]; then
             echo -e "${G} [*] Downloading & installing Oh My Zsh (unattended)...${RS}"
-            sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+            if [ "$TARGET_USER" != "$(whoami)" ]; then
+                sudo -u "$TARGET_USER" sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+            else
+                sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+            fi
         fi
     fi
 
     # Deploy Theme File
     echo -e "${G} [*] Copying theme file to Zsh directory...${RS}"
-    OMZ_THEMES="$HOME/.oh-my-zsh/themes"
-    STANDALONE_THEMES="$HOME/.zsh/themes"
+    OMZ_THEMES="$TARGET_HOME/.oh-my-zsh/themes"
+    STANDALONE_THEMES="$TARGET_HOME/.zsh/themes"
     
-    if [ -d "$HOME/.oh-my-zsh" ]; then
+    if [ -d "$TARGET_HOME/.oh-my-zsh" ]; then
         mkdir -p "$OMZ_THEMES"
-        cp "$SCRIPT_DIR/.object/.h4Ck3r.zsh-theme" "$OMZ_THEMES/h4Ck3r.zsh-theme"
+        sed -e "s/H4CK3R/$custom_name/g" "$SCRIPT_DIR/.object/.h4Ck3r.zsh-theme" > "$OMZ_THEMES/h4Ck3r.zsh-theme"
     fi
     mkdir -p "$STANDALONE_THEMES"
-    cp "$SCRIPT_DIR/.object/.h4Ck3r.zsh-theme" "$STANDALONE_THEMES/h4Ck3r.zsh-theme"
+    sed -e "s/H4CK3R/$custom_name/g" "$SCRIPT_DIR/.object/.h4Ck3r.zsh-theme" > "$STANDALONE_THEMES/h4Ck3r.zsh-theme"
 
     # Set up Config
     echo -e "${G} [*] Deploying custom .zshrc...${RS}"
-    [ -f "$HOME/.zshrc" ] && cp "$HOME/.zshrc" "$HOME/.zshrc.bak"
-    sed -e "s/PROC/$custom_name/g" "$SCRIPT_DIR/.object/.zshrc_template" > "$HOME/.zshrc"
+    [ -f "$TARGET_HOME/.zshrc" ] && cp "$TARGET_HOME/.zshrc" "$TARGET_HOME/.zshrc.bak"
+    sed -e "s/PROC/$custom_name/g" "$SCRIPT_DIR/.object/.zshrc_template" > "$TARGET_HOME/.zshrc"
 
     # Deploy Fastfetch Config
     echo -e "${G} [*] Copying Fastfetch configuration...${RS}"
-    mkdir -p "$HOME/.config/fastfetch"
-    cp "$SCRIPT_DIR/.object/fastfetch_config.jsonc" "$HOME/.config/fastfetch/config.jsonc"
+    mkdir -p "$TARGET_HOME/.config/fastfetch"
+    cp "$SCRIPT_DIR/.object/fastfetch_config.jsonc" "$TARGET_HOME/.config/fastfetch/config.jsonc"
 
     # Change Default Shell
     if [[ "$SHELL" != */zsh ]]; then
         read -p " Change default shell to Zsh? [y/N]: " change_shell
         if [[ "$change_shell" =~ ^[Yy]$ ]]; then
-            $SUDO_CMD chsh -s "$(command -v zsh)" "$USER"
+            $SUDO_CMD chsh -s "$(command -v zsh)" "$TARGET_USER"
             echo -e "${G} [✓] Shell changed to Zsh. Please log out and back in for changes to take effect.${RS}"
         fi
     fi
+
+    adjust_ownership "$TARGET_HOME/.zshrc" "$TARGET_HOME/.zshrc.bak" "$TARGET_HOME/.oh-my-zsh/themes/h4Ck3r.zsh-theme" "$TARGET_HOME/.zsh" "$TARGET_HOME/.config/fastfetch"
 
     echo -e "${G} [✓] Zsh theme applied successfully!${RS}"
     sleep 2
@@ -143,13 +169,15 @@ apply_bash_theme() {
     custom_name=${custom_name:-H4CK3R}
 
     echo -e "${G} [*] Deploying custom .bashrc...${RS}"
-    [ -f "$HOME/.bashrc" ] && cp "$HOME/.bashrc" "$HOME/.bashrc.bak"
-    sed -e "s/PROC/$custom_name/g" "$SCRIPT_DIR/.object/.bashrc_template" > "$HOME/.bashrc"
+    [ -f "$TARGET_HOME/.bashrc" ] && cp "$TARGET_HOME/.bashrc" "$TARGET_HOME/.bashrc.bak"
+    sed -e "s/PROC/$custom_name/g" "$SCRIPT_DIR/.object/.bashrc_template" > "$TARGET_HOME/.bashrc"
 
     # Deploy Fastfetch Config
     echo -e "${G} [*] Copying Fastfetch configuration...${RS}"
-    mkdir -p "$HOME/.config/fastfetch"
-    cp "$SCRIPT_DIR/.object/fastfetch_config.jsonc" "$HOME/.config/fastfetch/config.jsonc"
+    mkdir -p "$TARGET_HOME/.config/fastfetch"
+    cp "$SCRIPT_DIR/.object/fastfetch_config.jsonc" "$TARGET_HOME/.config/fastfetch/config.jsonc"
+
+    adjust_ownership "$TARGET_HOME/.bashrc" "$TARGET_HOME/.bashrc.bak" "$TARGET_HOME/.config/fastfetch"
 
     echo -e "${G} [✓] Bash theme applied successfully! Run 'source ~/.bashrc' to apply.${RS}"
     sleep 2
@@ -169,23 +197,25 @@ apply_fish_theme() {
     custom_name=${custom_name:-H4CK3R}
 
     echo -e "${G} [*] Deploying custom config.fish...${RS}"
-    mkdir -p "$HOME/.config/fish"
-    [ -f "$HOME/.config/fish/config.fish" ] && cp "$HOME/.config/fish/config.fish" "$HOME/.config/fish/config.fish.bak"
-    sed -e "s/PROC/$custom_name/g" "$SCRIPT_DIR/.object/config.fish_template" > "$HOME/.config/fish/config.fish"
+    mkdir -p "$TARGET_HOME/.config/fish"
+    [ -f "$TARGET_HOME/.config/fish/config.fish" ] && cp "$TARGET_HOME/.config/fish/config.fish" "$TARGET_HOME/.config/fish/config.fish.bak"
+    sed -e "s/PROC/$custom_name/g" "$SCRIPT_DIR/.object/config.fish_template" > "$TARGET_HOME/.config/fish/config.fish"
 
     # Deploy Fastfetch Config
     echo -e "${G} [*] Copying Fastfetch configuration...${RS}"
-    mkdir -p "$HOME/.config/fastfetch"
-    cp "$SCRIPT_DIR/.object/fastfetch_config.jsonc" "$HOME/.config/fastfetch/config.jsonc"
+    mkdir -p "$TARGET_HOME/.config/fastfetch"
+    cp "$SCRIPT_DIR/.object/fastfetch_config.jsonc" "$TARGET_HOME/.config/fastfetch/config.jsonc"
 
     # Change Default Shell
     if [[ "$SHELL" != */fish ]]; then
         read -p " Change default shell to Fish? [y/N]: " change_shell
         if [[ "$change_shell" =~ ^[Yy]$ ]]; then
-            $SUDO_CMD chsh -s "$(command -v fish)" "$USER"
+            $SUDO_CMD chsh -s "$(command -v fish)" "$TARGET_USER"
             echo -e "${G} [✓] Shell changed to Fish. Please log out and back in for changes to take effect.${RS}"
         fi
     fi
+
+    adjust_ownership "$TARGET_HOME/.config/fish" "$TARGET_HOME/.config/fastfetch"
 
     echo -e "${G} [✓] Fish theme applied successfully!${RS}"
     sleep 2
@@ -201,26 +231,44 @@ apply_zsh_plugins() {
     $SUDO_CMD apt install -y zsh-syntax-highlighting zsh-autosuggestions 2>/dev/null
     
     # Backup setup: Clone to user directories
-    ZSH_PLUGINS_DIR="$HOME/.zsh"
+    ZSH_PLUGINS_DIR="$TARGET_HOME/.zsh"
     mkdir -p "$ZSH_PLUGINS_DIR"
 
     # Syntax Highlighting
     if [ ! -d "$ZSH_PLUGINS_DIR/zsh-syntax-highlighting" ]; then
         echo -e "${G} [*] Cloning zsh-syntax-highlighting...${RS}"
-        git clone https://github.com/zsh-users/zsh-syntax-highlighting.git "$ZSH_PLUGINS_DIR/zsh-syntax-highlighting"
+        if [ "$TARGET_USER" != "$(whoami)" ]; then
+            sudo -u "$TARGET_USER" git clone https://github.com/zsh-users/zsh-syntax-highlighting.git "$ZSH_PLUGINS_DIR/zsh-syntax-highlighting"
+        else
+            git clone https://github.com/zsh-users/zsh-syntax-highlighting.git "$ZSH_PLUGINS_DIR/zsh-syntax-highlighting"
+        fi
     else
         echo -e "${G} [*] Updating zsh-syntax-highlighting...${RS}"
-        cd "$ZSH_PLUGINS_DIR/zsh-syntax-highlighting" && git pull && cd "$SCRIPT_DIR"
+        if [ "$TARGET_USER" != "$(whoami)" ]; then
+            sudo -u "$TARGET_USER" sh -c "cd '$ZSH_PLUGINS_DIR/zsh-syntax-highlighting' && git pull"
+        else
+            cd "$ZSH_PLUGINS_DIR/zsh-syntax-highlighting" && git pull && cd "$SCRIPT_DIR"
+        fi
     fi
 
     # Autosuggestions
     if [ ! -d "$ZSH_PLUGINS_DIR/zsh-autosuggestions" ]; then
         echo -e "${G} [*] Cloning zsh-autosuggestions...${RS}"
-        git clone https://github.com/zsh-users/zsh-autosuggestions "$ZSH_PLUGINS_DIR/zsh-autosuggestions"
+        if [ "$TARGET_USER" != "$(whoami)" ]; then
+            sudo -u "$TARGET_USER" git clone https://github.com/zsh-users/zsh-autosuggestions "$ZSH_PLUGINS_DIR/zsh-autosuggestions"
+        else
+            git clone https://github.com/zsh-users/zsh-autosuggestions "$ZSH_PLUGINS_DIR/zsh-autosuggestions"
+        fi
     else
         echo -e "${G} [*] Updating zsh-autosuggestions...${RS}"
-        cd "$ZSH_PLUGINS_DIR/zsh-autosuggestions" && git pull && cd "$SCRIPT_DIR"
+        if [ "$TARGET_USER" != "$(whoami)" ]; then
+            sudo -u "$TARGET_USER" sh -c "cd '$ZSH_PLUGINS_DIR/zsh-autosuggestions' && git pull"
+        else
+            cd "$ZSH_PLUGINS_DIR/zsh-autosuggestions" && git pull && cd "$SCRIPT_DIR"
+        fi
     fi
+
+    adjust_ownership "$ZSH_PLUGINS_DIR"
 
     echo -e "${G} [✓] Plugins ready! Reload Zsh to verify.${RS}"
     sleep 2
@@ -238,9 +286,9 @@ apply_bash_plugins() {
     if [ -f "/usr/share/blesh/ble.sh" ]; then
         blesh_installed=true
         blesh_path="/usr/share/blesh/ble.sh"
-    elif [ -f "$HOME/.local/share/blesh/ble.sh" ]; then
+    elif [ -f "$TARGET_HOME/.local/share/blesh/ble.sh" ]; then
         blesh_installed=true
-        blesh_path="$HOME/.local/share/blesh/ble.sh"
+        blesh_path="$TARGET_HOME/.local/share/blesh/ble.sh"
     fi
     
     if [ "$blesh_installed" = true ]; then
@@ -259,17 +307,35 @@ apply_bash_plugins() {
         # Fallback to nightly pre-built download if package manager failed
         if [ "$blesh_installed" = false ]; then
             echo -e "${Y} [*] Package blesh not found or install failed. Downloading pre-built ble.sh nightly...${RS}"
-            local blesh_dir="$HOME/.local/share/blesh"
-            mkdir -p "$blesh_dir"
+            local blesh_dir="$TARGET_HOME/.local/share/blesh"
+            if [ "$TARGET_USER" != "$(whoami)" ]; then
+                sudo -u "$TARGET_USER" mkdir -p "$blesh_dir"
+            else
+                mkdir -p "$blesh_dir"
+            fi
             if command -v curl &>/dev/null && command -v tar &>/dev/null; then
-                if curl -L https://github.com/akinomyoga/ble.sh/releases/download/nightly/ble-nightly.tar.xz | tar xJf - -C "$blesh_dir" --strip-components=1; then
-                    blesh_installed=true
-                    blesh_path="$blesh_dir/ble.sh"
+                if [ "$TARGET_USER" != "$(whoami)" ]; then
+                    if sudo -u "$TARGET_USER" curl -L https://github.com/akinomyoga/ble.sh/releases/download/nightly/ble-nightly.tar.xz | sudo -u "$TARGET_USER" tar xJf - -C "$blesh_dir" --strip-components=1; then
+                        blesh_installed=true
+                        blesh_path="$blesh_dir/ble.sh"
+                    fi
+                else
+                    if curl -L https://github.com/akinomyoga/ble.sh/releases/download/nightly/ble-nightly.tar.xz | tar xJf - -C "$blesh_dir" --strip-components=1; then
+                        blesh_installed=true
+                        blesh_path="$blesh_dir/ble.sh"
+                    fi
                 fi
             elif command -v wget &>/dev/null && command -v tar &>/dev/null; then
-                if wget -O - https://github.com/akinomyoga/ble.sh/releases/download/nightly/ble-nightly.tar.xz | tar xJf - -C "$blesh_dir" --strip-components=1; then
-                    blesh_installed=true
-                    blesh_path="$blesh_dir/ble.sh"
+                if [ "$TARGET_USER" != "$(whoami)" ]; then
+                    if sudo -u "$TARGET_USER" wget -O - https://github.com/akinomyoga/ble.sh/releases/download/nightly/ble-nightly.tar.xz | sudo -u "$TARGET_USER" tar xJf - -C "$blesh_dir" --strip-components=1; then
+                        blesh_installed=true
+                        blesh_path="$blesh_dir/ble.sh"
+                    fi
+                else
+                    if wget -O - https://github.com/akinomyoga/ble.sh/releases/download/nightly/ble-nightly.tar.xz | tar xJf - -C "$blesh_dir" --strip-components=1; then
+                        blesh_installed=true
+                        blesh_path="$blesh_dir/ble.sh"
+                    fi
                 fi
             fi
         fi
@@ -283,8 +349,8 @@ apply_bash_plugins() {
     fi
     
     # Configure in ~/.bashrc
-    if [ -f "$HOME/.bashrc" ]; then
-        if ! grep -q "ble.sh" "$HOME/.bashrc"; then
+    if [ -f "$TARGET_HOME/.bashrc" ]; then
+        if ! grep -q "ble.sh" "$TARGET_HOME/.bashrc"; then
             echo -e "${G} [*] Adding ble.sh to .bashrc...${RS}"
             
             # Temporary file to build new .bashrc
@@ -306,7 +372,7 @@ apply_bash_plugins() {
                         added=true
                     fi
                 fi
-            done < "$HOME/.bashrc"
+            done < "$TARGET_HOME/.bashrc"
             
             if [ "$added" = false ]; then
                 # Prepend if no interactive check line was matched
@@ -318,7 +384,7 @@ apply_bash_plugins() {
                     echo '    source "$HOME/.local/share/blesh/ble.sh" --noattach'
                     echo 'fi'
                     echo ""
-                    cat "$HOME/.bashrc"
+                    cat "$TARGET_HOME/.bashrc"
                 ) > "$temp_rc"
             fi
             
@@ -326,13 +392,13 @@ apply_bash_plugins() {
             echo -e "\n# Attach ble.sh\n[[ \${BLE_VERSION-} ]] && ble-attach" >> "$temp_rc"
             
             # Move back to ~/.bashrc
-            cp "$HOME/.bashrc" "$HOME/.bashrc.bak"
-            mv "$temp_rc" "$HOME/.bashrc"
+            cp "$TARGET_HOME/.bashrc" "$TARGET_HOME/.bashrc.bak"
+            mv "$temp_rc" "$TARGET_HOME/.bashrc"
         fi
     else
         # No .bashrc exists, create a minimal one
         echo -e "${G} [*] Creating a minimal .bashrc with ble.sh configuration...${RS}"
-        cat << EOF > "$HOME/.bashrc"
+        cat << EOF > "$TARGET_HOME/.bashrc"
 # ~/.bashrc - Customized by Kali-TH
 
 # If not running interactively, don't do anything
@@ -350,6 +416,8 @@ fi
 EOF
     fi
     
+    adjust_ownership "$TARGET_HOME/.bashrc" "$TARGET_HOME/.bashrc.bak" "$TARGET_HOME/.local/share/blesh"
+
     echo -e "${G} [✓] ble.sh is configured! Restart your Bash terminal or run 'source ~/.bashrc' to apply.${RS}"
     sleep 3
     apply_plugins
@@ -366,11 +434,15 @@ apply_fish_plugins() {
     
     # Run Fisher installation via Fish shell
     echo -e "${G} [*] Installing Fisher plugin manager...${RS}"
-    fish -c 'curl -sL https://raw.githubusercontent.com/jorgebucaran/fisher/main/functions/fisher.fish | source && fisher install jorgebucaran/fisher'
-    
-    # Install plugins
-    echo -e "${G} [*] Installing Fish plugins (fzf.fish, sponge, fish-colored-man)...${RS}"
-    fish -c 'fisher install PatrickF1/fzf.fish meaningful-ooo/sponge decors/fish-colored-man'
+    if [ "$TARGET_USER" != "$(whoami)" ]; then
+        sudo -u "$TARGET_USER" fish -c 'curl -sL https://raw.githubusercontent.com/jorgebucaran/fisher/main/functions/fisher.fish | source && fisher install jorgebucaran/fisher'
+        echo -e "${G} [*] Installing Fish plugins (fzf.fish, sponge, fish-colored-man)...${RS}"
+        sudo -u "$TARGET_USER" fish -c 'fisher install PatrickF1/fzf.fish meaningful-ooo/sponge decors/fish-colored-man'
+    else
+        fish -c 'curl -sL https://raw.githubusercontent.com/jorgebucaran/fisher/main/functions/fisher.fish | source && fisher install jorgebucaran/fisher'
+        echo -e "${G} [*] Installing Fish plugins (fzf.fish, sponge, fish-colored-man)...${RS}"
+        fish -c 'fisher install PatrickF1/fzf.fish meaningful-ooo/sponge decors/fish-colored-man'
+    fi
     
     echo -e "${G} [✓] Fish plugins setup completed!${RS}"
     sleep 2
@@ -407,9 +479,9 @@ install_modern_cli() {
     echo -e "${G} [*] Configuring modern CLI tool configurations & aliases...${RS}"
     
     # Zsh configuration
-    if [ -f "$HOME/.zshrc" ]; then
-        if ! grep -q "Modern CLI Alternatives" "$HOME/.zshrc"; then
-            cat << 'EOF' >> "$HOME/.zshrc"
+    if [ -f "$TARGET_HOME/.zshrc" ]; then
+        if ! grep -q "Modern CLI Alternatives" "$TARGET_HOME/.zshrc"; then
+            cat << 'EOF' >> "$TARGET_HOME/.zshrc"
 
 # Modern CLI Alternatives & Aliases
 if command -v eza &> /dev/null; then
@@ -431,12 +503,12 @@ EOF
     fi
     
     # Bash configuration
-    if [ -f "$HOME/.bashrc" ]; then
-        if ! grep -q "Modern CLI Alternatives" "$HOME/.bashrc"; then
-            if grep -q "# Attach ble.sh" "$HOME/.bashrc"; then
-                sed -i '/# Attach ble.sh/i # Modern CLI Alternatives \& Aliases\nif command -v eza \&> \/dev\/null; then\n    alias ls='\''eza --icons --group-directories-first'\''\n    alias la='\''eza -a --icons --group-directories-first'\''\n    alias ll='\''eza -lh --icons --group-directories-first'\''\nfi\nif command -v bat \&> \/dev\/null; then\n    alias cat='\''bat --style=plain --paging=never'\''\nfi\nif command -v fdfind \&> \/dev\/null; then\n    alias fd='\''fdfind'\''\nfi\nif command -v zoxide \&> \/dev\/null; then\n    eval "$(zoxide init bash)"\nfi\n' "$HOME/.bashrc"
+    if [ -f "$TARGET_HOME/.bashrc" ]; then
+        if ! grep -q "Modern CLI Alternatives" "$TARGET_HOME/.bashrc"; then
+            if grep -q "# Attach ble.sh" "$TARGET_HOME/.bashrc"; then
+                sed -i '/# Attach ble.sh/i # Modern CLI Alternatives \& Aliases\nif command -v eza \&> \/dev\/null; then\n    alias ls='\''eza --icons --group-directories-first'\''\n    alias la='\''eza -a --icons --group-directories-first'\''\n    alias ll='\''eza -lh --icons --group-directories-first'\''\nfi\nif command -v bat \&> \/dev\/null; then\n    alias cat='\''bat --style=plain --paging=never'\''\nfi\nif command -v fdfind \&> \/dev\/null; then\n    alias fd='\''fdfind'\''\nfi\nif command -v zoxide \&> \/dev\/null; then\n    eval "$(zoxide init bash)"\nfi\n' "$TARGET_HOME/.bashrc"
             else
-                cat << 'EOF' >> "$HOME/.bashrc"
+                cat << 'EOF' >> "$TARGET_HOME/.bashrc"
 
 # Modern CLI Alternatives & Aliases
 if command -v eza &> /dev/null; then
@@ -459,9 +531,9 @@ EOF
     fi
     
     # Fish configuration
-    if [ -f "$HOME/.config/fish/config.fish" ]; then
-        if ! grep -q "Modern CLI Alternatives" "$HOME/.config/fish/config.fish"; then
-            cat << 'EOF' >> "$HOME/.config/fish/config.fish"
+    if [ -f "$TARGET_HOME/.config/fish/config.fish" ]; then
+        if ! grep -q "Modern CLI Alternatives" "$TARGET_HOME/.config/fish/config.fish"; then
+            cat << 'EOF' >> "$TARGET_HOME/.config/fish/config.fish"
 
 # Modern CLI Alternatives & Aliases
 if type -q eza
@@ -482,7 +554,7 @@ EOF
         fi
     fi
     
-    echo -e "${G} [✓] Modern CLI tools installed and configured!${RS}"
+    adjust_ownership "$TARGET_HOME/.zshrc" "$TARGET_HOME/.bashrc" "$TARGET_HOME/.config/fish" ; echo -e "${G} [✓] Modern CLI tools installed and configured!${RS}"
     sleep 3
     menu
 }
@@ -493,14 +565,14 @@ write_tmux_conf() {
     local secondary="red"
     local success="green"
     
-    if [ -f "$HOME/.config/archify/colors.sh" ]; then
-        source "$HOME/.config/archify/colors.sh"
+    if [ -f "$TARGET_HOME/.config/archify/colors.sh" ]; then
+        source "$TARGET_HOME/.config/archify/colors.sh"
         primary="${ARCHIFY_PRIMARY_NAME:-blue}"
         secondary="${ARCHIFY_SECONDARY_NAME:-red}"
         success="${ARCHIFY_SUCCESS_NAME:-green}"
     fi
     
-    cat << EOF > "$HOME/.tmux.conf"
+    cat << EOF > "$TARGET_HOME/.tmux.conf"
 # Custom tmux configuration by Kali-TH
 
 # Set prefix key to Ctrl-a (instead of Ctrl-b)
@@ -546,10 +618,10 @@ setup_tmux() {
     $SUDO_CMD apt install -y tmux
     
     echo -e "${G} [*] Deploying custom .tmux.conf...${RS}"
-    [ -f "$HOME/.tmux.conf" ] && cp "$HOME/.tmux.conf" "$HOME/.tmux.conf.bak"
+    [ -f "$TARGET_HOME/.tmux.conf" ] && cp "$TARGET_HOME/.tmux.conf" "$TARGET_HOME/.tmux.conf.bak"
     write_tmux_conf
     
-    echo -e "${G} [✓] tmux successfully configured!${RS}"
+    adjust_ownership "$TARGET_HOME/.tmux.conf" "$TARGET_HOME/.tmux.conf.bak" ; echo -e "${G} [✓] tmux successfully configured!${RS}"
     sleep 2
     menu
 }
@@ -568,9 +640,9 @@ choose_color_theme() {
     echo -ne "${B} kali-th${W}@${R}root${W}:${C}~${RS}# "
     read theme_opt
     
-    local c_sh="$HOME/.config/archify/colors.sh"
-    local c_fish="$HOME/.config/archify/colors.fish"
-    mkdir -p "$HOME/.config/archify"
+    local c_sh="$TARGET_HOME/.config/archify/colors.sh"
+    local c_fish="$TARGET_HOME/.config/archify/colors.fish"
+    mkdir -p "$TARGET_HOME/.config/archify"
     
     case $theme_opt in
         1|01)
@@ -694,11 +766,11 @@ EOF
     esac
     
     # If tmux is configured, update the theme there too
-    if [ -f "$HOME/.tmux.conf" ]; then
+    if [ -f "$TARGET_HOME/.tmux.conf" ]; then
         write_tmux_conf
     fi
     
-    echo -e "${G} [✓] Color theme applied successfully! Reload your shell to see changes.${RS}"
+    adjust_ownership "$TARGET_HOME/.config/archify" "$TARGET_HOME/.tmux.conf" ; echo -e "${G} [✓] Color theme applied successfully! Reload your shell to see changes.${RS}"
     sleep 2
     menu
 }
@@ -712,9 +784,9 @@ setup_atuin() {
     echo -e "${G} [*] Injecting Atuin integration into user config files...${RS}"
     
     # Zsh configuration
-    if [ -f "$HOME/.zshrc" ]; then
-        if ! grep -q "Atuin History Integration" "$HOME/.zshrc"; then
-            cat << 'EOF' >> "$HOME/.zshrc"
+    if [ -f "$TARGET_HOME/.zshrc" ]; then
+        if ! grep -q "Atuin History Integration" "$TARGET_HOME/.zshrc"; then
+            cat << 'EOF' >> "$TARGET_HOME/.zshrc"
 
 # Atuin History Integration
 if command -v atuin &> /dev/null; then
@@ -725,12 +797,12 @@ EOF
     fi
     
     # Bash configuration
-    if [ -f "$HOME/.bashrc" ]; then
-        if ! grep -q "Atuin History Integration" "$HOME/.bashrc"; then
-            if grep -q "# Attach ble.sh" "$HOME/.bashrc"; then
-                sed -i '/# Attach ble.sh/i # Atuin History Integration\nif command -v atuin \&> \/dev\/null; then\n    eval "$(atuin init bash)"\nfi\n' "$HOME/.bashrc"
+    if [ -f "$TARGET_HOME/.bashrc" ]; then
+        if ! grep -q "Atuin History Integration" "$TARGET_HOME/.bashrc"; then
+            if grep -q "# Attach ble.sh" "$TARGET_HOME/.bashrc"; then
+                sed -i '/# Attach ble.sh/i # Atuin History Integration\nif command -v atuin \&> \/dev\/null; then\n    eval "$(atuin init bash)"\nfi\n' "$TARGET_HOME/.bashrc"
             else
-                cat << 'EOF' >> "$HOME/.bashrc"
+                cat << 'EOF' >> "$TARGET_HOME/.bashrc"
 
 # Atuin History Integration
 if command -v atuin &> /dev/null; then
@@ -742,9 +814,9 @@ EOF
     fi
     
     # Fish configuration
-    if [ -f "$HOME/.config/fish/config.fish" ]; then
-        if ! grep -q "Atuin History Integration" "$HOME/.config/fish/config.fish"; then
-            cat << 'EOF' >> "$HOME/.config/fish/config.fish"
+    if [ -f "$TARGET_HOME/.config/fish/config.fish" ]; then
+        if ! grep -q "Atuin History Integration" "$TARGET_HOME/.config/fish/config.fish"; then
+            cat << 'EOF' >> "$TARGET_HOME/.config/fish/config.fish"
 
 # Atuin History Integration
 if type -q atuin
@@ -754,7 +826,7 @@ EOF
         fi
     fi
     
-    echo -e "${G} [✓] Atuin integration set up successfully!${RS}"
+    adjust_ownership "$TARGET_HOME/.zshrc" "$TARGET_HOME/.bashrc" "$TARGET_HOME/.config/fish" ; echo -e "${G} [✓] Atuin integration set up successfully!${RS}"
     sleep 2
     menu
 }
@@ -787,7 +859,7 @@ setup_dev_tools() {
             ;;
     esac
     
-    echo -e "${G} [✓] Developer tools configured!${RS}"
+    adjust_ownership "$TARGET_HOME/.config/nvim" "$TARGET_HOME/.local/share/nvim" "$TARGET_HOME/.local/state/nvim" "$TARGET_HOME/.cache/nvim" ; echo -e "${G} [✓] Developer tools configured!${RS}"
     sleep 2
     menu
 }
@@ -800,13 +872,13 @@ configure_nvim() {
     read -p " Would you like to install the LazyVim theme starter config? [y/N]: " inst_lazyvim
     if [[ "$inst_lazyvim" =~ ^[Yy]$ ]]; then
         echo -e "${G} [*] Backing up existing Neovim configurations...${RS}"
-        [ -d "$HOME/.config/nvim" ] && mv "$HOME/.config/nvim" "$HOME/.config/nvim.bak"
-        [ -d "$HOME/.local/share/nvim" ] && mv "$HOME/.local/share/nvim" "$HOME/.local/share/nvim.bak"
-        [ -d "$HOME/.local/state/nvim" ] && mv "$HOME/.local/state/nvim" "$HOME/.local/state/nvim.bak"
-        [ -d "$HOME/.cache/nvim" ] && mv "$HOME/.cache/nvim" "$HOME/.cache/nvim.bak"
+        [ -d "$TARGET_HOME/.config/nvim" ] && mv "$TARGET_HOME/.config/nvim" "$HOME/.config/nvim.bak"
+        [ -d "$TARGET_HOME/.local/share/nvim" ] && mv "$TARGET_HOME/.local/share/nvim" "$HOME/.local/share/nvim.bak"
+        [ -d "$TARGET_HOME/.local/state/nvim" ] && mv "$TARGET_HOME/.local/state/nvim" "$HOME/.local/state/nvim.bak"
+        [ -d "$TARGET_HOME/.cache/nvim" ] && mv "$TARGET_HOME/.cache/nvim" "$HOME/.cache/nvim.bak"
         
         echo -e "${G} [*] Cloning LazyVim starter config...${RS}"
-        git clone https://github.com/LazyVim/starter "$HOME/.config/nvim"
+        if [ "$TARGET_USER" != "$(whoami)" ]; then sudo -u "$TARGET_USER" git clone https://github.com/LazyVim/starter "$TARGET_HOME/.config/nvim"; else git clone https://github.com/LazyVim/starter "$TARGET_HOME/.config/nvim"; fi
         echo -e "${G} [✓] LazyVim config installed. Launch 'nvim' to initialize plugins.${RS}"
     fi
 }
@@ -842,7 +914,7 @@ configure_git() {
 # Install Nerd Fonts
 install_nerd_fonts() {
     echo -e "${G}\n [*] Preparing to install Nerd Fonts...${RS}"
-    FONT_DIR="$HOME/.local/share/fonts"
+    FONT_DIR="$TARGET_HOME/.local/share/fonts"
     mkdir -p "$FONT_DIR"
     
     echo -e "${C} Choose font to install:${RS}"
@@ -876,7 +948,7 @@ install_nerd_fonts() {
     echo -e "${G} [*] Rebuilding font cache...${RS}"
     fc-cache -fv &>/dev/null || $SUDO_CMD fc-cache -fv &>/dev/null
 
-    echo -e "${G} [✓] Nerd Font files installed!${RS}"
+    adjust_ownership "$TARGET_HOME/.local/share/fonts" ; echo -e "${G} [✓] Nerd Font files installed!${RS}"
     
     # Detect terminal emulator and give instructions
     TERM_EMULATOR="generic"
@@ -934,8 +1006,8 @@ install_starship() {
     fi
 
     echo -e "${G} [*] Deploying Starship configuration...${RS}"
-    mkdir -p "$HOME/.config"
-    cat << 'EOF' > "$HOME/.config/starship.toml"
+    mkdir -p "$TARGET_HOME/.config"
+    cat << 'EOF' > "$TARGET_HOME/.config/starship.toml"
 # Custom Starship Config by H4CK3R - Matches Custom Theme Design
 format = '''
 [┌─\[](bold blue)[㉿ ](bold red)$username[@](bold blue)$hostname[\]-\[](bold blue)$directory[\]](bold blue)$git_branch$git_status
@@ -974,30 +1046,30 @@ EOF
     echo -e "${G} [✓] Starship prompt configured!${RS}"
     
     # Auto-activate Starship in .zshrc
-    if [ -f "$HOME/.zshrc" ]; then
-        if ! grep -q "starship init zsh" "$HOME/.zshrc"; then
+    if [ -f "$TARGET_HOME/.zshrc" ]; then
+        if ! grep -q "starship init zsh" "$TARGET_HOME/.zshrc"; then
             echo -e "${G} [*] Activating Starship in your .zshrc...${RS}"
-            echo 'eval "$(starship init zsh)"' >> "$HOME/.zshrc"
+            echo 'eval "$(starship init zsh)"' >> "$TARGET_HOME/.zshrc"
         fi
     fi
 
     # Auto-activate Starship in .bashrc
-    if [ -f "$HOME/.bashrc" ]; then
-        if ! grep -q "starship init bash" "$HOME/.bashrc"; then
+    if [ -f "$TARGET_HOME/.bashrc" ]; then
+        if ! grep -q "starship init bash" "$TARGET_HOME/.bashrc"; then
             echo -e "${G} [*] Activating Starship in your .bashrc...${RS}"
-            echo 'eval "$(starship init bash)"' >> "$HOME/.bashrc"
+            echo 'eval "$(starship init bash)"' >> "$TARGET_HOME/.bashrc"
         fi
     fi
 
     # Auto-activate Starship in config.fish
-    if [ -f "$HOME/.config/fish/config.fish" ]; then
-        if ! grep -q "starship init fish" "$HOME/.config/fish/config.fish"; then
+    if [ -f "$TARGET_HOME/.config/fish/config.fish" ]; then
+        if ! grep -q "starship init fish" "$TARGET_HOME/.config/fish/config.fish"; then
             echo -e "${G} [*] Activating Starship in your config.fish...${RS}"
-            echo 'starship init fish | source' >> "$HOME/.config/fish/config.fish"
+            echo 'starship init fish | source' >> "$TARGET_HOME/.config/fish/config.fish"
         fi
     fi
 
-    echo -e "${G} [✓] Starship successfully enabled and configured! Reload your shell to see it.${RS}"
+    adjust_ownership "$TARGET_HOME/.config/starship.toml" "$TARGET_HOME/.zshrc" "$TARGET_HOME/.bashrc" "$TARGET_HOME/.config/fish" ; echo -e "${G} [✓] Starship successfully enabled and configured! Reload your shell to see it.${RS}"
     sleep 4
     menu
 }
@@ -1008,15 +1080,17 @@ reset_config() {
     read -p " Proceed? [y/N]: " confirm_reset
     if [[ "$confirm_reset" =~ ^[Yy]$ ]]; then
         echo -e "${G} [*] Backing up and resetting .zshrc, .bashrc, and config.fish...${RS}"
-        [ -f "$HOME/.zshrc" ] && cp "$HOME/.zshrc" "$HOME/.zshrc.bak" && rm "$HOME/.zshrc"
-        [ -f "$HOME/.bashrc" ] && cp "$HOME/.bashrc" "$HOME/.bashrc.bak" && rm "$HOME/.bashrc"
-        [ -f "$HOME/.config/fish/config.fish" ] && cp "$HOME/.config/fish/config.fish" "$HOME/.config/fish/config.fish.bak" && rm "$HOME/.config/fish/config.fish"
+        [ -f "$TARGET_HOME/.zshrc" ] && cp "$TARGET_HOME/.zshrc" "$TARGET_HOME/.zshrc.bak" && rm "$TARGET_HOME/.zshrc"
+        [ -f "$TARGET_HOME/.bashrc" ] && cp "$TARGET_HOME/.bashrc" "$TARGET_HOME/.bashrc.bak" && rm "$TARGET_HOME/.bashrc"
+        [ -f "$TARGET_HOME/.config/fish/config.fish" ] && cp "$TARGET_HOME/.config/fish/config.fish" "$TARGET_HOME/.config/fish/config.fish.bak" && rm "$TARGET_HOME/.config/fish/config.fish"
         
         # Simple default configs
-        echo -e "PROMPT='%F{cyan}%n@%m %F{blue}%~ %F{yellow}❯ %f'" > "$HOME/.zshrc"
-        echo -e "PS1='[\u@\h \W]\$ '" > "$HOME/.bashrc"
-        mkdir -p "$HOME/.config/fish"
-        echo -e "set fish_greeting\nfunction fish_prompt\n    set_color cyan\n    printf '%s ' (prompt_pwd)\n    set_color normal\nend" > "$HOME/.config/fish/config.fish"
+        echo -e "PROMPT='%F{cyan}%n@%m %F{blue}%~ %F{yellow}❯ %f'" > "$TARGET_HOME/.zshrc"
+        echo -e "PS1='[\u@\h \W]\$ '" > "$TARGET_HOME/.bashrc"
+        mkdir -p "$TARGET_HOME/.config/fish"
+        echo -e "set fish_greeting\nfunction fish_prompt\n    set_color cyan\n    printf '%s ' (prompt_pwd)\n    set_color normal\nend" > "$TARGET_HOME/.config/fish/config.fish"
+        
+        adjust_ownership "$TARGET_HOME/.zshrc" "$TARGET_HOME/.zshrc.bak" "$TARGET_HOME/.bashrc" "$TARGET_HOME/.bashrc.bak" "$TARGET_HOME/.config/fish"
         
         echo -e "${G} [✓] Configs reset. Backups saved as .zshrc.bak / .bashrc.bak / config.fish.bak${RS}"
     fi
@@ -1034,7 +1108,7 @@ customize_banner() {
     echo -e "  ${B}[4]${R} Disable Welcome Banner"
     read -p " Select option [1-4]: " banner_opt
     
-    local banner_script="$HOME/.archify-banner.sh"
+    local banner_script="$TARGET_HOME/.archify-banner.sh"
     
     case $banner_opt in
         1)
@@ -1044,9 +1118,9 @@ customize_banner() {
                 $SUDO_CMD apt install -y fastfetch
             fi
             
-            mkdir -p "$HOME/.config/fastfetch"
-            if [ ! -f "$HOME/.config/fastfetch/config.jsonc" ]; then
-                cp "$SCRIPT_DIR/.object/fastfetch_config.jsonc" "$HOME/.config/fastfetch/config.jsonc" 2>/dev/null || true
+            mkdir -p "$TARGET_HOME/.config/fastfetch"
+            if [ ! -f "$TARGET_HOME/.config/fastfetch/config.jsonc" ]; then
+                cp "$SCRIPT_DIR/.object/fastfetch_config.jsonc" "$TARGET_HOME/.config/fastfetch/config.jsonc" 2>/dev/null || true
             fi
             
             cat << 'EOF' > "$banner_script"
@@ -1059,13 +1133,14 @@ if command -v fastfetch &>/dev/null; then
         fastfetch
     fi
 else
-    echo -e "\e[1;34m  / \__\e[0m"
-    echo -e "\e[1;34m (    @\___ \e[1;37m  Kali Linux\e[0m"
-    echo -e "\e[1;34m /         O\e[0m"
-    echo -e "\e[1;34m/   (_____/\e[0m"
+    echo -e "\033[1;34m  / \__\033[0m"
+    echo -e "\033[1;34m (    @\___ \033[1;37m  Kali Linux\033[0m"
+    echo -e "\033[1;34m /         O\033[0m"
+    echo -e "\033[1;34m/   (_____/\033[0m"
 fi
 EOF
             chmod +x "$banner_script"
+            adjust_ownership "$banner_script" "$TARGET_HOME/.config/fastfetch"
             echo -e "${G} [✓] Fastfetch Welcome Banner configured!${RS}"
             ;;
         2)
@@ -1099,16 +1174,16 @@ EOF
             
             local color_code=""
             if [ "$color_choice" = "2" ]; then
-                color_code="\\\\e[1;36m"
+                color_code="\\\\033[1;36m"
             elif [ "$color_choice" = "3" ]; then
-                color_code="\\\\e[1;32m"
+                color_code="\\\\033[1;32m"
             elif [ "$color_choice" = "4" ]; then
-                color_code="\\\\e[1;37m"
+                color_code="\\\\033[1;37m"
             fi
             
             read -p " Include System Info Box? [y/N]: " include_info
             
-            local figlet_dir="$HOME/.local/share/figlet"
+            local figlet_dir="$TARGET_HOME/.local/share/figlet"
             mkdir -p "$figlet_dir"
             
             if ! command -v figlet &>/dev/null; then
@@ -1135,8 +1210,8 @@ EOF
 #!/usr/bin/env bash
 clear
 BOX_WIDTH=56
-cyan='\\e[1;36m'
-reset='\\e[0m'
+cyan='\\033[1;36m'
+reset='\\033[0m'
 
 print_center() {
     local text="\$1"
@@ -1166,7 +1241,7 @@ EOF
             elif [ -n "$color_code" ]; then
                 echo "echo -e \"$color_code\"" >> "$banner_script"
                 echo "$fig_cmd -c -w 56 \"$banner_text\" 2>/dev/null || echo -e \"   $banner_text\"" >> "$banner_script"
-                echo "echo -e \"\\\\e[0m\"" >> "$banner_script"
+                echo "echo -e \"\\\\033[0m\"" >> "$banner_script"
             else
                 echo "$fig_cmd -c -w 56 \"$banner_text\" 2>/dev/null || echo -e \"   $banner_text\"" >> "$banner_script"
             fi
@@ -1188,6 +1263,7 @@ EOF
             fi
             
             chmod +x "$banner_script"
+            adjust_ownership "$banner_script" "$figlet_dir"
             echo -e "${G} [✓] Custom Text figlet Banner configured!${RS}"
             ;;
         3)
@@ -1195,11 +1271,11 @@ EOF
             cat << 'EOF' > "$banner_script"
 #!/usr/bin/env bash
 clear
-R='\e[1;31m'
-W='\e[1;37m'
-G='\e[1;32m'
-B='\e[1;34m'
-RS='\e[0m'
+R='\033[1;31m'
+W='\033[1;37m'
+G='\033[1;32m'
+B='\033[1;34m'
+RS='\033[0m'
 
 echo -e "${B}  / \__${RS}"
 echo -e "${B} (    @\___ ${W}  Kali Linux${RS}"
@@ -1208,12 +1284,14 @@ echo -e "${B}/   (_____/${B}  Uptime: $(uptime -p)${RS}"
 echo ""
 EOF
             chmod +x "$banner_script"
+            adjust_ownership "$banner_script"
             echo -e "${G} [✓] Simple Kali ASCII Art configured!${RS}"
             ;;
         4)
             echo -e "${Y} [*] Disabling Welcome Banner...${RS}"
             echo -e "#!/usr/bin/env bash\n# Welcome Banner Disabled" > "$banner_script"
             chmod +x "$banner_script"
+            adjust_ownership "$banner_script"
             echo -e "${G} [✓] Welcome Banner disabled!${RS}"
             ;;
         *)
@@ -1225,14 +1303,14 @@ EOF
     esac
     
     # Ensure all configurations source/run the banner
-    if [ -f "$HOME/.bashrc" ] && ! grep -q ".archify-banner.sh" "$HOME/.bashrc"; then
-        echo -e "\n# Kali-TH Welcome Banner\nif [ -f \"\$HOME/.archify-banner.sh\" ]; then\n    bash \"\$HOME/.archify-banner.sh\"\nfi" >> "$HOME/.bashrc"
+    if [ -f "$TARGET_HOME/.bashrc" ] && ! grep -q ".archify-banner.sh" "$TARGET_HOME/.bashrc"; then
+        echo -e "\n# Kali-TH Welcome Banner\nif [ -f \"\$TARGET_HOME/.archify-banner.sh\" ]; then\n    bash \"\$TARGET_HOME/.archify-banner.sh\"\nfi" >> "$TARGET_HOME/.bashrc"
     fi
-    if [ -f "$HOME/.zshrc" ] && ! grep -q ".archify-banner.sh" "$HOME/.zshrc"; then
-        echo -e "\n# Kali-TH Welcome Banner\nif [ -f \"\$HOME/.archify-banner.sh\" ]; then\n    bash \"\$HOME/.archify-banner.sh\"\nfi" >> "$HOME/.zshrc"
+    if [ -f "$TARGET_HOME/.zshrc" ] && ! grep -q ".archify-banner.sh" "$TARGET_HOME/.zshrc"; then
+        echo -e "\n# Kali-TH Welcome Banner\nif [ -f \"\$TARGET_HOME/.archify-banner.sh\" ]; then\n    bash \"\$TARGET_HOME/.archify-banner.sh\"\nfi" >> "$TARGET_HOME/.zshrc"
     fi
-    if [ -f "$HOME/.config/fish/config.fish" ] && ! grep -q ".archify-banner.sh" "$HOME/.config/fish/config.fish"; then
-        echo -e "\n# Kali-TH Welcome Banner\nif test -f \"\$HOME/.archify-banner.sh\"\n    bash \"\$HOME/.archify-banner.sh\"\nend" >> "$HOME/.config/fish/config.fish"
+    if [ -f "$TARGET_HOME/.config/fish/config.fish" ] && ! grep -q ".archify-banner.sh" "$TARGET_HOME/.config/fish/config.fish"; then
+        echo -e "\n# Kali-TH Welcome Banner\nif test -f \"\$TARGET_HOME/.archify-banner.sh\"\n    bash \"\$TARGET_HOME/.archify-banner.sh\"\nend" >> "$TARGET_HOME/.config/fish/config.fish"
     fi
     
     sleep 2
