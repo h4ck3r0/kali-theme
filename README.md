@@ -3,11 +3,11 @@
 </p>
 <p align="center">
 <a href="https://h4ck3r0.github.io/"><img title="Made in INDIA" src="https://img.shields.io/badge/Tool-KaliTheme-green.svg?style=flat-square"></a>
-<a href="https://h4ck3r0.github.io/"><img title="Version" src="https://img.shields.io/badge/Version-1.0-green.svg?style=flat-square"></a>
+<a href="https://h4ck3r0.github.io/"><img title="Version" src="https://img.shields.io/badge/Version-4.0-green.svg?style=flat-square"></a>
 <a href="https://h4ck3r0.github.io/"><img title="Maintainence" src="https://img.shields.io/badge/Maintained%3F-yes-green.svg?style=flat-square"></a>
 </p>
 <p align="center">
- <a href=""><img src="https://user-images.githubusercontent.com/46929618/150728456-fa598cb6-3112-4b04-bfc6-e85b1af0ad7f.png" width="1000" hight="200"></a>
+  <a href=""><img src="https://user-images.githubusercontent.com/46929618/150728456-fa598cb6-3112-4b04-bfc6-e85b1af0ad7f.png" width="1000" hight="200"></a>
 </p>
 <p align="center">
 <a href="https://github.com/h4ck3r0"><img title="Github" src="https://img.shields.io/badge/H4CK3R-RAJ-brightgreen?style=for-the-badge&logo=github"></a>
@@ -25,18 +25,33 @@
 
 ## kali-theme
 
-
-
- kali-linux Theme Installer
-
- Pure Easy Installer
-
+Kali Linux Theme Installer - An interactive shell customization tool.
 
 <p align="center">
   <img src="https://user-images.githubusercontent.com/46929618/150728439-857011e4-2b1c-44ed-a388-24606b8aa684.png" width="300" hight="220">
 </p>
 
-Added Banner With Pure Theme ( made by H4ck3r ~ Raj Aryan )
+### Features
+
+- **Package Installer**: Installs dependencies (`zsh`, `fish`, `fastfetch`, `figlet`, `toilet`, `git`, `wget`, `curl`, `unzip`, `ruby`) using `apt`.
+- **Custom Zsh, Bash, & Fish Themes**: Deploys themed prompt configurations with custom host/username settings, Git branch visualizer, and custom colors.
+- **Fastfetch Presets**: Deploys a customized modern Fastfetch system layout.
+- **Multi-Shell Plugins Submenu**:
+  - **Zsh**: Installs `zsh-syntax-highlighting` and `zsh-autosuggestions`.
+  - **Bash**: Installs `ble.sh` (Bash Line Editor) for syntax highlighting and autocomplete.
+  - **Fish**: Installs `fisher` and plugins (`fzf.fish`, `sponge`, and `fish-colored-man`).
+- **Dynamic Color Presets**: Switch prompt accents dynamically:
+  - Cyberpunk Neon (Magenta & Cyan)
+  - Dracula (Purple & Green)
+  - Nord (Cyan & Blue)
+  - Gruvbox (Yellow & Red)
+  - Kali-TH Default (Blue & Red)
+- **Modern CLI replacements**: Installs and sets up `eza`, `bat`, `zoxide`, `ripgrep`, `fzf`, and `fd-find`.
+- **Tmux Theme**: Installs and sets up a customized status bar in `.tmux.conf` matching the accent color.
+- **Atuin Integration**: Integrates Atuin shell history sync for a unified, SQLite-powered shell command search interface.
+- **Developer Tools**: Configure Neovim (with LazyVim option) and Git (diff-so-fancy pager and colors).
+- **Nerd Fonts Installer**: Download and install custom Nerd Fonts (JetBrains Mono, Hack, Fira Code) to render terminal icons properly.
+- **Starship Prompt Integration**: Installs and applies a themed Starship preset matching the prompt styling.
 
 <p align="center">
   <img src="https://user-images.githubusercontent.com/46929618/150728320-e559415f-2433-475b-8534-e51d294f42de.png" width="300" hight="220">
@@ -44,8 +59,6 @@ Added Banner With Pure Theme ( made by H4ck3r ~ Raj Aryan )
 
 
 ## Installation
-
-
 
 `* [+] git clone https://github.com/h4ck3r0/kali-theme`
 
@@ -69,9 +82,8 @@ Added Banner With Pure Theme ( made by H4ck3r ~ Raj Aryan )
 <a href="https://www.buymeacoffee.com/h4ck3r" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
 
 
-<a href="https://github.com/h4ck3r0"><img title="Github" src="https://img.shields.io/badge/H4Ck3R-Raj-brightgreen?style=for-the-badge&logo=github"></a>
+<a href="https://github.com/h4ck3r0"><img title="Github" src="https://img.shields.io/badge/H4CK3R-Raj-brightgreen?style=for-the-badge&logo=github"></a>
 [![Instagram](https://img.shields.io/badge/INSTAGRAM-FOLLOW-red?style=for-the-badge&logo=instagram)](https://www.instagram.com/h4ck3r0_official?igsh=NzN1NTNucWhjOXJp)
 [![Instagram](https://img.shields.io/badge/WEBSITE-VISIT-yellow?style=for-the-badge&logo=blogger)](https://www.h4ck3r.me)
 [![Instagram](https://img.shields.io/badge/TELEGRAM-CHANNEL-red?style=for-the-badge&logo=telegram)](https://t.me/h4ck3r_group)
 <a href="https://rebrand.ly/7elzgww"><img title="YouTube" src="https://img.shields.io/badge/YouTube-H4Ck3R-red?style=for-the-badge&logo=Youtube"></a>
-

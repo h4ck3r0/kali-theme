@@ -1,0 +1,128 @@
+# ~/.config/fish/config.fish file for Kali Linux - Customized by H4CK3R
+
+# Disable greeting
+set fish_greeting
+
+# Shell variables/options
+set -gx CLICOLOR 1
+set -gx CLICOLOR_FORCE 1
+set -gx fish_autosuggestion_enabled 1
+
+# Load Archify colors
+if test -f "$HOME/.config/archify/colors.fish"
+    source "$HOME/.config/archify/colors.fish"
+end
+
+set -q ARCHIFY_PRIMARY; or set ARCHIFY_PRIMARY cyan
+set -q ARCHIFY_SECONDARY; or set ARCHIFY_SECONDARY blue
+set -q ARCHIFY_SUCCESS; or set ARCHIFY_SUCCESS green
+set -q ARCHIFY_ALERT; or set ARCHIFY_ALERT red
+set -q ARCHIFY_WARN; or set ARCHIFY_WARN yellow
+
+# Kali-TH Welcome Banner
+if test -f "$HOME/.archify-banner.sh"
+    bash "$HOME/.archify-banner.sh"
+else
+    # Fallback to fastfetch if banner script doesn't exist
+    if command -v fastfetch >/dev/null 2>&1
+        if test -f "$HOME/.config/fastfetch/config.jsonc"
+            fastfetch --config "$HOME/.config/fastfetch/config.jsonc"
+        else
+            fastfetch
+        end
+    else
+        # Simple ASCII Art fallback
+        set_color red
+        echo "  _  __        _ _      _______ _    _  "
+        echo " | |/ /       | (_)    |__   __| |  | | "
+        echo " | ' /  __ _  | |_       | |  | |__| | "
+        echo " |  <  / _\` | | | |      | |  |  __  | "
+        echo " | . \| (_| | | | |      | |  | |  | | "
+        echo " |_|\_\\\\__,_| |_|_|      |_|  |_|  |_| "
+        set_color normal
+    end
+end
+
+# Custom Fish Prompt
+# ┌─[㉿ name@KALI]-[~/path]
+# └─╼ ❯❯❯
+function fish_prompt
+    set -l last_status $status
+    echo
+    set_color $ARCHIFY_PRIMARY
+    printf "┌─["
+    set_color $ARCHIFY_SECONDARY
+    printf "㉿ PROC"
+    set_color $ARCHIFY_PRIMARY
+    printf "@"
+    set_color $ARCHIFY_SECONDARY
+    printf "KALI"
+    set_color $ARCHIFY_PRIMARY
+    printf "]-["
+    set_color $ARCHIFY_SUCCESS
+    printf "%s" (prompt_pwd)
+    set_color $ARCHIFY_PRIMARY
+    printf "]"
+    
+    # Git integration
+    if command -v git >/dev/null 2>&1
+        if git rev-parse --is-inside-work-tree >/dev/null 2>&1
+            set -l branch (git symbolic-ref --short HEAD 2>/dev/null)
+            set -l status_count (git status --porcelain 2>/dev/null | count)
+            if test $status_count -gt 0
+                set_color $ARCHIFY_ALERT
+                printf "─[git:(%s*)]" $branch
+            else
+                set_color $ARCHIFY_SUCCESS
+                printf "─[git:(%s)]" $branch
+            fi
+        end
+    end
+    
+    echo
+    set_color $ARCHIFY_PRIMARY
+    printf "└─╼ "
+    if test $last_status -eq 0
+        set_color $ARCHIFY_PRIMARY
+        printf "❯"
+        set_color $ARCHIFY_SECONDARY
+        printf "❯"
+        set_color white
+        printf "❯ "
+    else
+        set_color $ARCHIFY_ALERT
+        printf "✗"
+        set_color $ARCHIFY_SECONDARY
+        printf "❯"
+        set_color white
+        printf "❯ "
+    end
+    set_color normal
+end
+
+# Aliases
+alias ls='ls --color=auto'
+alias la='ls -A'
+alias ll='ls -lh'
+alias grep='grep --color=auto'
+alias aptupd='sudo apt update && sudo apt upgrade -y'
+alias aptinst='sudo apt install -y'
+alias aptrem='sudo apt remove --purge -y'
+
+# Modern CLI Alternatives & Aliases
+if type -q eza
+    alias ls="eza --icons --group-directories-first"
+    alias la="eza -a --icons --group-directories-first"
+    alias ll="eza -lh --icons --group-directories-first"
+end
+if type -q bat
+    alias cat="bat --style=plain --paging=never"
+end
+if type -q zoxide
+    zoxide init fish | source
+end
+
+# Atuin History Integration
+if type -q atuin
+    atuin init fish | source
+end

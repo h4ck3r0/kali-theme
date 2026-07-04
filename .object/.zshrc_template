@@ -22,6 +22,11 @@ bindkey '^[[3~' delete-char
 # Set Shell Name for the Prompt
 export SHELL_NAME="PROC"
 
+# Load Archify colors
+if [ -f "$HOME/.config/archify/colors.sh" ]; then
+    source "$HOME/.config/archify/colors.sh"
+fi
+
 # Oh-My-Zsh Integration
 if [ -d "$HOME/.oh-my-zsh" ]; then
     export ZSH="$HOME/.oh-my-zsh"
@@ -56,7 +61,6 @@ elif [ -f "$HOME/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh" ]; then
     ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=#666'
 fi
 
-
 # Aliases
 alias ls='ls --color=auto'
 alias la='ls -A'
@@ -67,16 +71,38 @@ alias aptinst='sudo apt install -y'
 alias aptrem='sudo apt remove --purge -y && sudo apt autoremove -y'
 
 # Interactive Thumbnail / Fastfetch Banner
-if [ -x "$(command -v fastfetch)" ]; then
-    if [ -f "$HOME/.config/fastfetch/config.jsonc" ]; then
-        fastfetch --config "$HOME/.config/fastfetch/config.jsonc"
-    else
-        fastfetch
-    fi
+if [ -f "$HOME/.archify-banner.sh" ]; then
+    bash "$HOME/.archify-banner.sh"
 else
-    # Simple ASCII Art fallback if fastfetch is missing
-    echo -e "\e[1;34m  / \__\e[0m"
-    echo -e "\e[1;34m (    @\___ \e[1;37m  Kali Linux\e[0m"
-    echo -e "\e[1;34m /         O\e[0m"
-    echo -e "\e[1;34m/   (_____/\e[0m"
+    if [ -x "$(command -v fastfetch)" ]; then
+        if [ -f "$HOME/.config/fastfetch/config.jsonc" ]; then
+            fastfetch --config "$HOME/.config/fastfetch/config.jsonc"
+        else
+            fastfetch
+        fi
+    else
+        # Simple ASCII Art fallback if fastfetch is missing
+        echo -e "\e[1;34m  / \__\e[0m"
+        echo -e "\e[1;34m (    @\___ \e[1;37m  Kali Linux\e[0m"
+        echo -e "\e[1;34m /         O\e[0m"
+        echo -e "\e[1;34m/   (_____/\e[0m"
+    fi
+fi
+
+# Modern CLI Alternatives & Aliases
+if command -v eza &> /dev/null; then
+    alias ls='eza --icons --group-directories-first'
+    alias la='eza -a --icons --group-directories-first'
+    alias ll='eza -lh --icons --group-directories-first'
+fi
+if command -v bat &> /dev/null; then
+    alias cat='bat --style=plain --paging=never'
+fi
+if command -v zoxide &> /dev/null; then
+    eval "$(zoxide init zsh)"
+fi
+
+# Atuin History Integration
+if command -v atuin &> /dev/null; then
+    eval "$(atuin init zsh)"
 fi

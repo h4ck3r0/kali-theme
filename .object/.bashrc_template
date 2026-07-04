@@ -3,23 +3,34 @@
 # If not running interactively, don't do anything
 [[ $- != *i* ]] && return
 
+# Enable ble.sh if installed
+if [ -f "/usr/share/blesh/ble.sh" ]; then
+    source /usr/share/blesh/ble.sh --noattach
+elif [ -f "$HOME/.local/share/blesh/ble.sh" ]; then
+    source "$HOME/.local/share/blesh/ble.sh" --noattach
+fi
+
 # Basic Settings
 HISTCONTROL=ignoreboth
 shopt -s histappend
 HISTSIZE=10000
 HISTFILESIZE=20000
 
-# Color definition
-C_BLUE='\[\e[1;34m\]'
-C_RED='\[\e[1;31m\]'
-C_GREEN='\[\e[1;32m\]'
+# Load Archify colors
+if [ -f "$HOME/.config/archify/colors.sh" ]; then
+    source "$HOME/.config/archify/colors.sh"
+fi
+
+C_PRIMARY="\[\e[1;${ARCHIFY_PRIMARY:-34}m\]"
+C_SECONDARY="\[\e[1;${ARCHIFY_SECONDARY:-31}m\]"
+C_SUCCESS="\[\e[1;${ARCHIFY_SUCCESS:-32}m\]"
 C_WHITE='\[\e[1;37m\]'
 C_RESET='\[\e[0m\]'
 
 # Custom Bash Prompt
 # ┌─[㉿ name@KALI]-[~/path]
 # └─╼ ❯❯❯
-export PS1="\n${C_BLUE}┌─[${C_RED}㉿ PROC${C_BLUE}@${C_RED}KALI${C_BLUE}]-[${C_GREEN}\w${C_BLUE}]\n└─╼ ${C_BLUE}❯${C_RED}❯${C_WHITE}❯ ${C_RESET}"
+export PS1="\n\${C_PRIMARY}┌─[\${C_SECONDARY}㉿ PROC\${C_PRIMARY}@\${C_SECONDARY}KALI\${C_PRIMARY}]-[\${C_SUCCESS}\w\${C_PRIMARY}]\n└─╼ \${C_PRIMARY}❯\${C_SECONDARY}❯\${C_WHITE}❯ \${C_RESET}"
 
 # Aliases
 alias ls='ls --color=auto'
@@ -31,16 +42,41 @@ alias aptinst='sudo apt install -y'
 alias aptrem='sudo apt remove --purge -y && sudo apt autoremove -y'
 
 # Interactive Thumbnail / Fastfetch Banner
-if [ -x "$(command -v fastfetch)" ]; then
-    if [ -f "$HOME/.config/fastfetch/config.jsonc" ]; then
-        fastfetch --config "$HOME/.config/fastfetch/config.jsonc"
-    else
-        fastfetch
-    fi
+if [ -f "$HOME/.archify-banner.sh" ]; then
+    bash "$HOME/.archify-banner.sh"
 else
-    # Simple ASCII Art fallback if fastfetch is missing
-    echo -e "\e[1;34m  / \__\e[0m"
-    echo -e "\e[1;34m (    @\___ \e[1;37m  Kali Linux\e[0m"
-    echo -e "\e[1;34m /         O\e[0m"
-    echo -e "\e[1;34m/   (_____/\e[0m"
+    if [ -x "$(command -v fastfetch)" ]; then
+        if [ -f "$HOME/.config/fastfetch/config.jsonc" ]; then
+            fastfetch --config "$HOME/.config/fastfetch/config.jsonc"
+        else
+            fastfetch
+        fi
+    else
+        # Simple ASCII Art fallback if fastfetch is missing
+        echo -e "\e[1;34m  / \__\e[0m"
+        echo -e "\e[1;34m (    @\___ \e[1;37m  Kali Linux\e[0m"
+        echo -e "\e[1;34m /         O\e[0m"
+        echo -e "\e[1;34m/   (_____/\e[0m"
+    fi
 fi
+
+# Modern CLI Alternatives & Aliases
+if command -v eza &> /dev/null; then
+    alias ls='eza --icons --group-directories-first'
+    alias la='eza -a --icons --group-directories-first'
+    alias ll='eza -lh --icons --group-directories-first'
+fi
+if command -v bat &> /dev/null; then
+    alias cat='bat --style=plain --paging=never'
+fi
+if command -v zoxide &> /dev/null; then
+    eval "$(zoxide init bash)"
+fi
+
+# Atuin History Integration
+if command -v atuin &> /dev/null; then
+    eval "$(atuin init bash)"
+fi
+
+# Attach ble.sh
+[[ ${BLE_VERSION-} ]] && ble-attach
