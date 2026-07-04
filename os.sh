@@ -117,9 +117,9 @@ apply_zsh_theme() {
         if [[ "$inst_omz" =~ ^[Yy]$ ]]; then
             echo -e "${G} [*] Downloading & installing Oh My Zsh (unattended)...${RS}"
             if [ "$TARGET_USER" != "$(whoami)" ]; then
-                sudo -u "$TARGET_USER" sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+                sudo -u "$TARGET_USER" env CHSH=no RUNZSH=no sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
             else
-                sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+                env CHSH=no RUNZSH=no sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
             fi
         fi
     fi
