@@ -1206,9 +1206,14 @@ EOF
             fi
             
             local font_file="$figlet_dir/$font_name.flf"
+            # Delete corrupted/404 cached font files (valid figlet files start with 'flf2a')
+            if [ -f "$font_file" ] && ! head -n 1 "$font_file" 2>/dev/null | grep -q "^flf2a"; then
+                rm -f "$font_file"
+            fi
+            
             if [ ! -f "$font_file" ]; then
                 echo -e "${Y} [*] Downloading $font_name font...${RS}"
-                curl -s -L "https://raw.githubusercontent.com/patorjk/figlet.js/master/fonts/$font_name.flf" -o "$font_file"
+                curl -s -L "https://raw.githubusercontent.com/phracker/figlet-fonts/master/$font_name.flf" -o "$font_file"
                 if [ ! -f "$font_file" ] || [ ! -s "$font_file" ]; then
                     echo -e "${R} [!] Failed to download $font_name font. Using default standard font.${RS}"
                     font_file=""
