@@ -177,6 +177,15 @@ apply_bash_theme() {
     mkdir -p "$TARGET_HOME/.config/fastfetch"
     cp "$SCRIPT_DIR/.object/fastfetch_config.jsonc" "$TARGET_HOME/.config/fastfetch/config.jsonc"
 
+    # Change Default Shell
+    if [[ "$SHELL" != */bash ]]; then
+        read -p " Change default shell to Bash? [y/N]: " change_shell
+        if [[ "$change_shell" =~ ^[Yy]$ ]]; then
+            $SUDO_CMD chsh -s "$(command -v bash)" "$TARGET_USER"
+            echo -e "${G} [✓] Shell changed to Bash. Please log out and back in for changes to take effect.${RS}"
+        fi
+    fi
+
     adjust_ownership "$TARGET_HOME/.bashrc" "$TARGET_HOME/.bashrc.bak" "$TARGET_HOME/.config/fastfetch"
 
     echo -e "${G} [✓] Bash theme applied successfully! Run 'source ~/.bashrc' to apply.${RS}"
@@ -1302,15 +1311,22 @@ EOF
             ;;
     esac
     
+    # Fix any existing broken banner references
+    for rc in "$TARGET_HOME/.bashrc" "$TARGET_HOME/.zshrc" "$TARGET_HOME/.config/fish/config.fish"; do
+        if [ -f "$rc" ]; then
+            sed -i 's/\$TARGET_HOME\/\.archify-banner\.sh/\$HOME\/\.archify-banner\.sh/g' "$rc"
+        fi
+    done
+
     # Ensure all configurations source/run the banner
     if [ -f "$TARGET_HOME/.bashrc" ] && ! grep -q ".archify-banner.sh" "$TARGET_HOME/.bashrc"; then
-        echo -e "\n# Kali-TH Welcome Banner\nif [ -f \"\$TARGET_HOME/.archify-banner.sh\" ]; then\n    bash \"\$TARGET_HOME/.archify-banner.sh\"\nfi" >> "$TARGET_HOME/.bashrc"
+        echo -e "\n# Kali-TH Welcome Banner\nif [ -f \"\$HOME/.archify-banner.sh\" ]; then\n    bash \"\$HOME/.archify-banner.sh\"\nfi" >> "$TARGET_HOME/.bashrc"
     fi
     if [ -f "$TARGET_HOME/.zshrc" ] && ! grep -q ".archify-banner.sh" "$TARGET_HOME/.zshrc"; then
-        echo -e "\n# Kali-TH Welcome Banner\nif [ -f \"\$TARGET_HOME/.archify-banner.sh\" ]; then\n    bash \"\$TARGET_HOME/.archify-banner.sh\"\nfi" >> "$TARGET_HOME/.zshrc"
+        echo -e "\n# Kali-TH Welcome Banner\nif [ -f \"\$HOME/.archify-banner.sh\" ]; then\n    bash \"\$HOME/.archify-banner.sh\"\nfi" >> "$TARGET_HOME/.zshrc"
     fi
     if [ -f "$TARGET_HOME/.config/fish/config.fish" ] && ! grep -q ".archify-banner.sh" "$TARGET_HOME/.config/fish/config.fish"; then
-        echo -e "\n# Kali-TH Welcome Banner\nif test -f \"\$TARGET_HOME/.archify-banner.sh\"\n    bash \"\$TARGET_HOME/.archify-banner.sh\"\nend" >> "$TARGET_HOME/.config/fish/config.fish"
+        echo -e "\n# Kali-TH Welcome Banner\nif test -f \"\$HOME/.archify-banner.sh\"\n    bash \"\$HOME/.archify-banner.sh\"\nend" >> "$TARGET_HOME/.config/fish/config.fish"
     fi
     
     sleep 2

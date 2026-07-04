@@ -21,16 +21,16 @@ if [ -f "$HOME/.config/archify/colors.sh" ]; then
     source "$HOME/.config/archify/colors.sh"
 fi
 
-C_PRIMARY="\[\e[1;${ARCHIFY_PRIMARY:-34}m\]"
-C_SECONDARY="\[\e[1;${ARCHIFY_SECONDARY:-31}m\]"
-C_SUCCESS="\[\e[1;${ARCHIFY_SUCCESS:-32}m\]"
-C_WHITE='\[\e[1;37m\]'
-C_RESET='\[\e[0m\]'
+C_PRIMARY=$'\033[1;'"${ARCHIFY_PRIMARY:-34}"'m'
+C_SECONDARY=$'\033[1;'"${ARCHIFY_SECONDARY:-31}"'m'
+C_SUCCESS=$'\033[1;'"${ARCHIFY_SUCCESS:-32}"'m'
+C_WHITE=$'\033[1;37m'
+C_RESET=$'\033[0m'
 
 # Custom Bash Prompt
 # ┌─[㉿ name@KALI]-[~/path]
 # └─╼ ❯❯❯
-export PS1="\n\${C_PRIMARY}┌─[\${C_SECONDARY}㉿ PROC\${C_PRIMARY}@\${C_SECONDARY}KALI\${C_PRIMARY}]-[\${C_SUCCESS}\w\${C_PRIMARY}]\n└─╼ \${C_PRIMARY}❯\${C_SECONDARY}❯\${C_WHITE}❯ \${C_RESET}"
+export PS1="\n\\[\${C_PRIMARY}\\]┌─[\\[\${C_SECONDARY}\\]㉿ PROC\\[\${C_PRIMARY}\\]@\\[\${C_SECONDARY}\\]KALI\\[\${C_PRIMARY}\\]]-[\\[\${C_SUCCESS}\\]\w\\[\${C_PRIMARY}\\]]\n└─╼ \\[\${C_PRIMARY}\\]❯\\[\${C_SECONDARY}\\]❯\\[\${C_WHITE}\\]❯ \\[\${C_RESET}\]"
 
 # Aliases
 alias ls='ls --color=auto'
