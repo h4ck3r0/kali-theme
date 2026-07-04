@@ -38,7 +38,7 @@ else
     if [ -f "$HOME/.zsh/themes/h4Ck3r.zsh-theme" ]; then
         source "$HOME/.zsh/themes/h4Ck3r.zsh-theme"
     else
-        PROMPT='%F{blue}%n@%m %F{red}%~ %F{yellow}❯ %f'
+        PROMPT='%F{blue}%n㉿%m %F{red}%~ %F{yellow}❯ %f'
     fi
 fi
 

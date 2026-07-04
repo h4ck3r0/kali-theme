@@ -52,9 +52,9 @@ function fish_prompt
     set_color $ARCHIFY_PRIMARY
     printf "┌─["
     set_color $ARCHIFY_SECONDARY
-    printf "㉿ PROC"
+    printf "PROC"
     set_color $ARCHIFY_PRIMARY
-    printf "@"
+    printf "㉿"
     set_color $ARCHIFY_SECONDARY
     printf "KALI"
     set_color $ARCHIFY_PRIMARY

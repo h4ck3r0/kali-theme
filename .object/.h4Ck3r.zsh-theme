@@ -36,7 +36,7 @@ fi
 # ┌─[㉿ name@KALI]-[~/path] [git status]
 # └─╼ ❯❯❯
 PROMPT="
-%F{\${ARCHIFY_PRIMARY}}┌─%F{\${ARCHIFY_PRIMARY}}[%F{\${ARCHIFY_SECONDARY}}㉿ %B\${SHELL_NAME:-H4CK3R}%b%F{\${ARCHIFY_PRIMARY}}@%B%F{\${ARCHIFY_SECONDARY}}KALI%b%F{\${ARCHIFY_PRIMARY}}]%F{\${ARCHIFY_PRIMARY}}-%F{\${ARCHIFY_PRIMARY}}[%B%F{\${ARCHIFY_SUCCESS}}%~%b%F{\${ARCHIFY_PRIMARY}}]%f \$(git_prompt_info)
+%F{\${ARCHIFY_PRIMARY}}┌─%F{\${ARCHIFY_PRIMARY}}[%F{\${ARCHIFY_SECONDARY}}%B\${SHELL_NAME:-H4CK3R}%b%F{\${ARCHIFY_PRIMARY}}㉿%B%F{\${ARCHIFY_SECONDARY}}KALI%b%F{\${ARCHIFY_PRIMARY}}]%F{\${ARCHIFY_PRIMARY}}-%F{\${ARCHIFY_PRIMARY}}[%B%F{\${ARCHIFY_SUCCESS}}%~%b%F{\${ARCHIFY_PRIMARY}}]%f \$(git_prompt_info)
 %F{\${ARCHIFY_PRIMARY}}└─╼ %B%F{\${ARCHIFY_PRIMARY}}❯%F{\${ARCHIFY_SECONDARY}}❯%F{white}❯ %f%b"
 
 # Git Prompt configuration for Oh-My-Zsh (used if OMZ is loaded)

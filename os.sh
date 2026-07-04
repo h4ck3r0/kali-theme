@@ -1014,38 +1014,42 @@ install_starship() {
         curl -sS https://starship.rs/install.sh | sh -s -- -y
     fi
 
+    echo -e "${C}"
+    read -p " Enter Custom Shell Prompt Name [Default: H4CK3R] ❯ " custom_name
+    custom_name=${custom_name:-H4CK3R}
+
     echo -e "${G} [*] Deploying Starship configuration...${RS}"
     mkdir -p "$TARGET_HOME/.config"
-    cat << 'EOF' > "$TARGET_HOME/.config/starship.toml"
+    cat << EOF > "$TARGET_HOME/.config/starship.toml"
 # Custom Starship Config by H4CK3R - Matches Custom Theme Design
 format = '''
-[┌─\[](bold blue)[㉿ ](bold red)$username[@](bold blue)$hostname[\]-\[](bold blue)$directory[\]](bold blue)$git_branch$git_status
-$character'''
+[┌─\\[](bold blue)\$username[㉿](bold blue)\$hostname[\\]-\\[](bold blue)\$directory[\\]](bold blue)\$git_branch\$git_status
+\$character'''
 
 [username]
 show_always = true
-style_user = "bold white"
-format = "$user"
+style_user = "bold red"
+format = "$custom_name"
 
 [hostname]
 ssh_only = false
 style = "bold red"
-format = "$hostname"
+format = "\$hostname"
 
 [directory]
 style = "bold green"
-format = "$path"
+format = "\$path"
 truncation_length = 3
 truncation_symbol = "…/"
 
 [git_branch]
 symbol = " "
 style = "bold red"
-format = '-\[[git:\(](bold blue)$symbol$branch[\)](bold blue)\]'
+format = '-\\[git:\\(](bold blue)\$symbol\$branch[\\)](bold blue)\\]'
 
 [git_status]
 style = "bold red"
-format = "[$all_status$ahead_behind]($style)"
+format = "[\$all_status\$ahead_behind](\$style)"
 
 [character]
 success_symbol = "[└─╼ ](bold blue)[❯❯❯](bold red) "
@@ -1163,7 +1167,8 @@ EOF
             echo -e "  ${B}[3]${G} Shadow"
             echo -e "  ${B}[4]${G} Doom"
             echo -e "  ${B}[5]${G} Block"
-            read -p " Select option [1-5]: " font_choice
+            echo -e "  ${B}[6]${G} ANSI Shadow"
+            read -p " Select option [1-6]: " font_choice
             
             local font_name="standard"
             case $font_choice in
@@ -1171,6 +1176,7 @@ EOF
                 3) font_name="shadow" ;;
                 4) font_name="doom" ;;
                 5) font_name="block" ;;
+                6) font_name="ANSI Shadow" ;;
                 *) font_name="standard" ;;
             esac
             
@@ -1213,7 +1219,11 @@ EOF
             
             if [ ! -f "$font_file" ]; then
                 echo -e "${Y} [*] Downloading $font_name font...${RS}"
-                curl -s -L "https://raw.githubusercontent.com/phracker/figlet-fonts/master/$font_name.flf" -o "$font_file"
+                if [ "$font_name" = "ANSI Shadow" ]; then
+                    curl -s -L "https://raw.githubusercontent.com/h4ck3r0/Termux-os/master/.object/ANSI%20Shadow.flf" -o "$font_file"
+                else
+                    curl -s -L "https://raw.githubusercontent.com/phracker/figlet-fonts/master/$font_name.flf" -o "$font_file"
+                fi
                 if [ ! -f "$font_file" ] || [ ! -s "$font_file" ]; then
                     echo -e "${R} [!] Failed to download $font_name font. Using default standard font.${RS}"
                     font_file=""
