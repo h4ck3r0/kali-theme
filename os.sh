@@ -1029,16 +1029,17 @@ format = '''
 [username]
 show_always = true
 style_user = "bold red"
-format = "$custom_name"
+style_root = "bold red"
+format = "[$custom_name](\$style)"
 
 [hostname]
 ssh_only = false
 style = "bold red"
-format = "\$hostname"
+format = "[KALI](\$style)"
 
 [directory]
 style = "bold green"
-format = "\$path"
+format = "[\$path](\$style)"
 truncation_length = 3
 truncation_symbol = "…/"
 
