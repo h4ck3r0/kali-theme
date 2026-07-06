@@ -51,9 +51,9 @@ function fish_prompt
     echo
     set_color $ARCHIFY_PRIMARY
     printf "┌─["
-    set_color $ARCHIFY_SECONDARY
-    printf "PROC"
     set_color $ARCHIFY_PRIMARY
+    printf "PROC"
+    set_color white
     printf "㉿"
     set_color $ARCHIFY_SECONDARY
     printf "KALI"
@@ -88,14 +88,14 @@ function fish_prompt
         set_color $ARCHIFY_SECONDARY
         printf "❯"
         set_color $ARCHIFY_SUCCESS
-        printf "❯  "
+        printf "❯ "
     else
         set_color $ARCHIFY_ALERT
         printf "✗"
         set_color $ARCHIFY_SECONDARY
         printf "❯"
         set_color $ARCHIFY_SUCCESS
-        printf "❯  "
+        printf "❯ "
     end
     set_color normal
 end
