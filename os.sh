@@ -656,7 +656,7 @@ write_starship_config() {
     cat << EOF > "$TARGET_HOME/.config/starship.toml"
 # Custom Starship Config by H4CK3R - Matches Custom Theme Design
 format = '''
-[┌─\\[]($primary)\$username[@](white)\$hostname[\\]-\\[]($primary)\$directory[\\]]($primary)\$git_branch\$git_status
+[┌─\\[]($primary)\$username[@]($primary)\$hostname[\\]-\\[]($primary)\$directory[\\]]($primary)\$git_branch\$git_status
 \$character'''
 
 [username]
@@ -816,12 +816,12 @@ set -gx ARCHIFY_WARN yellow
 EOF
             ;;
         5|05)
-            # Kali-TH Default (Blue & Red)
+            # Kali-TH Default (Red & Blue)
             cat << 'EOF' > "$c_sh"
-export ARCHIFY_PRIMARY='34'
-export ARCHIFY_PRIMARY_NAME='blue'
-export ARCHIFY_SECONDARY='31'
-export ARCHIFY_SECONDARY_NAME='red'
+export ARCHIFY_PRIMARY='31'
+export ARCHIFY_PRIMARY_NAME='red'
+export ARCHIFY_SECONDARY='34'
+export ARCHIFY_SECONDARY_NAME='blue'
 export ARCHIFY_SUCCESS='32'
 export ARCHIFY_SUCCESS_NAME='green'
 export ARCHIFY_ALERT='31'
@@ -830,8 +830,8 @@ export ARCHIFY_WARN='33'
 export ARCHIFY_WARN_NAME='yellow'
 EOF
             cat << 'EOF' > "$c_fish"
-set -gx ARCHIFY_PRIMARY blue
-set -gx ARCHIFY_SECONDARY red
+set -gx ARCHIFY_PRIMARY red
+set -gx ARCHIFY_SECONDARY blue
 set -gx ARCHIFY_SUCCESS green
 set -gx ARCHIFY_ALERT red
 set -gx ARCHIFY_WARN yellow

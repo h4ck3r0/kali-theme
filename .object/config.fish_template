@@ -53,7 +53,7 @@ function fish_prompt
     printf "┌─["
     set_color $ARCHIFY_SUCCESS
     printf "PROC"
-    set_color white
+    set_color $ARCHIFY_PRIMARY
     printf "@"
     set_color $ARCHIFY_SECONDARY
     printf "KALI"
