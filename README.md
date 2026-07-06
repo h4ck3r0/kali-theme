@@ -28,7 +28,7 @@
 Kali Linux Theme Installer - An interactive shell customization tool.
 
 <p align="center">
-  <img src="https://user-images.githubusercontent.com/46929618/150728439-857011e4-2b1c-44ed-a388-24606b8aa684.png" width="300" hight="220">
+  <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiXjxKhuHr1fN_IuPAKPH3lrK9etQ4dKvlZh8z9JbXU7I8hU-5yDt2NDJEdeBvCue14EraWeSl-gE47lw2WSvf9AfcYFc9Sgg0MBZlJmG_R1ptd3aMemEOjs3-ZwAYcCSeldLIGgaqlwb1mOGRnoBNo7FH0Cy3D6go8H4xDykArMPWDBPN3kC1exmLoR-6Z/s949/Screenshot%202026-07-06%20221629.png" width="900">
 </p>
 
 ### Features
@@ -46,12 +46,15 @@ Kali Linux Theme Installer - An interactive shell customization tool.
   - Nord (Cyan & Blue)
   - Gruvbox (Yellow & Red)
   - Kali-TH Default (Blue & Red)
+  - Stealth Matrix (Green & Yellow)
+  - Ice Cold (Tech Blue & Cyan)
 - **Modern CLI replacements**: Installs and sets up `eza`, `bat`, `zoxide`, `ripgrep`, `fzf`, and `fd-find`.
-- **Tmux Theme**: Installs and sets up a customized status bar in `.tmux.conf` matching the accent color.
+- **Tmux Theme & Auto-Start**: Installs and sets up a customized status bar in `.tmux.conf` matching the accent color, with an optional toggle to auto-start Tmux on terminal launch.
 - **Atuin Integration**: Integrates Atuin shell history sync for a unified, SQLite-powered shell command search interface.
 - **Developer Tools**: Configure Neovim (with LazyVim option) and Git (diff-so-fancy pager and colors).
 - **Nerd Fonts Installer**: Download and install custom Nerd Fonts (JetBrains Mono, Hack, Fira Code) to render terminal icons properly.
 - **Starship Prompt Integration**: Installs and applies a themed Starship preset matching the prompt styling.
+- **Passwordless Shell Changer**: Uses `usermod` instead of `chsh` to switch shells silently without prompting for passwords.
 
 <p align="center">
   <img src="https://user-images.githubusercontent.com/46929618/150728320-e559415f-2433-475b-8534-e51d294f42de.png" width="300" hight="220">
