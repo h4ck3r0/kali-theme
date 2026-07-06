@@ -715,6 +715,8 @@ choose_color_theme() {
     printf "  ${DG}[${C}03${DG}]${W} Nord (Cyan & Blue)\n"
     printf "  ${DG}[${C}04${DG}]${W} Gruvbox (Yellow & Red)\n"
     printf "  ${DG}[${C}05${DG}]${W} Kali-TH Default (Blue & Red)\n"
+    printf "  ${DG}[${C}06${DG}]${W} Stealth Matrix (Green & Yellow)\n"
+    printf "  ${DG}[${C}07${DG}]${W} Ice Cold (Tech Blue & Cyan)\n"
     printf "  ${DG}[${C}00${DG}]${R} Back to Main Menu\n"
     echo -e " ${DG}──────────────────────────────────────────────────${RS}"
     echo -ne "${B} kali-th${W}@${R}root${W}:${C}~${RS}# "
@@ -831,6 +833,50 @@ EOF
 set -gx ARCHIFY_PRIMARY blue
 set -gx ARCHIFY_SECONDARY red
 set -gx ARCHIFY_SUCCESS green
+set -gx ARCHIFY_ALERT red
+set -gx ARCHIFY_WARN yellow
+EOF
+            ;;
+        6|06)
+            # Stealth Matrix (Green & Yellow)
+            cat << 'EOF' > "$c_sh"
+export ARCHIFY_PRIMARY='32'
+export ARCHIFY_PRIMARY_NAME='green'
+export ARCHIFY_SECONDARY='33'
+export ARCHIFY_SECONDARY_NAME='yellow'
+export ARCHIFY_SUCCESS='37'
+export ARCHIFY_SUCCESS_NAME='white'
+export ARCHIFY_ALERT='31'
+export ARCHIFY_ALERT_NAME='red'
+export ARCHIFY_WARN='33'
+export ARCHIFY_WARN_NAME='yellow'
+EOF
+            cat << 'EOF' > "$c_fish"
+set -gx ARCHIFY_PRIMARY green
+set -gx ARCHIFY_SECONDARY yellow
+set -gx ARCHIFY_SUCCESS white
+set -gx ARCHIFY_ALERT red
+set -gx ARCHIFY_WARN yellow
+EOF
+            ;;
+        7|07)
+            # Ice Cold (Tech Blue & Cyan)
+            cat << 'EOF' > "$c_sh"
+export ARCHIFY_PRIMARY='34'
+export ARCHIFY_PRIMARY_NAME='blue'
+export ARCHIFY_SECONDARY='36'
+export ARCHIFY_SECONDARY_NAME='cyan'
+export ARCHIFY_SUCCESS='37'
+export ARCHIFY_SUCCESS_NAME='white'
+export ARCHIFY_ALERT='31'
+export ARCHIFY_ALERT_NAME='red'
+export ARCHIFY_WARN='33'
+export ARCHIFY_WARN_NAME='yellow'
+EOF
+            cat << 'EOF' > "$c_fish"
+set -gx ARCHIFY_PRIMARY blue
+set -gx ARCHIFY_SECONDARY cyan
+set -gx ARCHIFY_SUCCESS white
 set -gx ARCHIFY_ALERT red
 set -gx ARCHIFY_WARN yellow
 EOF
