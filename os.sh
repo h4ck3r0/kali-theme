@@ -26,6 +26,19 @@ if [ -n "$SUDO_USER" ] && [ "$SUDO_USER" != "root" ]; then
 else
     TARGET_USER="$(whoami)"
     TARGET_HOME="$HOME"
+    # If run as root directly, fallback to the standard 'kali' user or first home user
+    if [ "$TARGET_USER" = "root" ]; then
+        if id "kali" &>/dev/null; then
+            TARGET_USER="kali"
+            TARGET_HOME="/home/kali"
+        elif [ -d "/home" ]; then
+            FIRST_USER=$(ls -1 /home 2>/dev/null | grep -v 'lost+found' | head -n 1)
+            if [ -n "$FIRST_USER" ]; then
+                TARGET_USER="$FIRST_USER"
+                TARGET_HOME="/home/$FIRST_USER"
+            fi
+        fi
+    fi
 fi
 
 # Ownership Correction Helper
