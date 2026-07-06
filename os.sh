@@ -701,7 +701,34 @@ setup_tmux() {
     [ -f "$TARGET_HOME/.tmux.conf" ] && cp "$TARGET_HOME/.tmux.conf" "$TARGET_HOME/.tmux.conf.bak"
     write_tmux_conf
     
-    adjust_ownership "$TARGET_HOME/.tmux.conf" "$TARGET_HOME/.tmux.conf.bak" ; echo -e "${G} [✓] tmux successfully configured!${RS}"
+    adjust_ownership "$TARGET_HOME/.tmux.conf" "$TARGET_HOME/.tmux.conf.bak"
+    echo -e "${G} [✓] tmux successfully configured!${RS}"
+
+    echo -e "${C}"
+    read -p " Would you like to enable Tmux auto-start on terminal launch? [y/N]: " tmux_auto
+    if [[ "$tmux_auto" =~ ^[Yy]$ ]]; then
+        # Add to .zshrc
+        if [ -f "$TARGET_HOME/.zshrc" ]; then
+            if ! grep -q "exec tmux" "$TARGET_HOME/.zshrc"; then
+                echo -e "\n# Auto-start Tmux\nif [ -z \"\$TMUX\" ] && [ -n \"\$PS1\" ]; then\n    exec tmux\nfi" >> "$TARGET_HOME/.zshrc"
+            fi
+        fi
+        # Add to .bashrc
+        if [ -f "$TARGET_HOME/.bashrc" ]; then
+            if ! grep -q "exec tmux" "$TARGET_HOME/.bashrc"; then
+                echo -e "\n# Auto-start Tmux\nif [ -z \"\$TMUX\" ] && [ -n \"\$PS1\" ]; then\n    exec tmux\nfi" >> "$TARGET_HOME/.bashrc"
+            fi
+        fi
+        # Add to config.fish
+        if [ -d "$TARGET_HOME/.config/fish" ] && [ -f "$TARGET_HOME/.config/fish/config.fish" ]; then
+            if ! grep -q "exec tmux" "$TARGET_HOME/.config/fish/config.fish"; then
+                echo -e "\n# Auto-start Tmux\nif not set -q TMUX; and status is-interactive\n    exec tmux\nend" >> "$TARGET_HOME/.config/fish/config.fish"
+            fi
+        fi
+        echo -e "${G} [✓] Tmux auto-start enabled!${RS}"
+        adjust_ownership "$TARGET_HOME/.zshrc" "$TARGET_HOME/.bashrc" "$TARGET_HOME/.config/fish/config.fish"
+    fi
+    
     sleep 2
     menu
 }
