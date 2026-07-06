@@ -54,7 +54,7 @@ function fish_prompt
     set_color $ARCHIFY_PRIMARY
     printf "PROC"
     set_color white
-    printf "㉿"
+    printf "@"
     set_color $ARCHIFY_SECONDARY
     printf "KALI"
     set_color $ARCHIFY_PRIMARY

@@ -643,7 +643,7 @@ write_starship_config() {
     cat << EOF > "$TARGET_HOME/.config/starship.toml"
 # Custom Starship Config by H4CK3R - Matches Custom Theme Design
 format = '''
-[┌─\\[](bold $primary)\$username[㉿](bold white)\$hostname[\\]-\\[](bold $primary)\$directory[\\]](bold $primary)\$git_branch\$git_status
+[┌─\\[](bold $primary)\$username[@](bold white)\$hostname[\\]-\\[](bold $primary)\$directory[\\]](bold $primary)\$git_branch\$git_status
 \$character'''
 
 [username]
