@@ -623,6 +623,62 @@ set -g pane-active-border-style fg=$primary
 EOF
 }
 
+# Helper to write starship.toml based on active color configurations
+write_starship_config() {
+    local custom_name="$1"
+    
+    # Read active colors
+    local primary="blue"
+    local secondary="red"
+    local success="green"
+    
+    if [ -f "$TARGET_HOME/.config/archify/colors.sh" ]; then
+        source "$TARGET_HOME/.config/archify/colors.sh"
+        primary="${ARCHIFY_PRIMARY_NAME:-blue}"
+        secondary="${ARCHIFY_SECONDARY_NAME:-red}"
+        success="${ARCHIFY_SUCCESS_NAME:-green}"
+    fi
+    
+    mkdir -p "$TARGET_HOME/.config"
+    cat << EOF > "$TARGET_HOME/.config/starship.toml"
+# Custom Starship Config by H4CK3R - Matches Custom Theme Design
+format = '''
+[┌─\\[](bold $primary)\$username[㉿](bold $primary)\$hostname[\\]-\\[](bold $primary)\$directory[\\]](bold $primary)\$git_branch\$git_status
+\$character'''
+
+[username]
+show_always = true
+style_user = "bold $secondary"
+style_root = "bold $secondary"
+format = "[$custom_name](\$style)"
+
+[hostname]
+ssh_only = false
+style = "bold $secondary"
+format = "[KALI](\$style)"
+
+[directory]
+style = "bold $success"
+format = "[\$path](\$style)"
+truncation_length = 3
+truncation_symbol = "…/"
+
+[git_branch]
+symbol = " "
+style = "bold $secondary"
+format = '-\\[[git:\\(](bold $primary)\$symbol\$branch[\\)](bold $primary)\\]'
+
+[git_status]
+style = "bold $secondary"
+format = "[\$all_status\$ahead_behind](\$style)"
+
+[character]
+success_symbol = "[└─╼ ](bold $primary)[❯❯❯](bold $secondary) "
+error_symbol = "[└─╼ ](bold $primary)[✗❯❯](bold $secondary) "
+EOF
+}
+
+
 # Setup Custom Tmux configuration
 setup_tmux() {
     echo -e "${G}\n [*] Installing tmux...${RS}"
@@ -779,9 +835,20 @@ EOF
     # If tmux is configured, update the theme there too
     if [ -f "$TARGET_HOME/.tmux.conf" ]; then
         write_tmux_conf
+        if command -v tmux &>/dev/null && tmux info &>/dev/null; then
+            tmux source-file "$TARGET_HOME/.tmux.conf" 2>/dev/null || true
+        fi
     fi
     
-    adjust_ownership "$TARGET_HOME/.config/archify" "$TARGET_HOME/.tmux.conf" ; echo -e "${G} [✓] Color theme applied successfully! Reload your shell to see changes.${RS}"
+    # If Starship is configured, update the theme there too
+    if [ -f "$TARGET_HOME/.config/starship.toml" ]; then
+        local existing_name="H4CK3R"
+        existing_name=$(grep -A 4 "^\[username\]" "$TARGET_HOME/.config/starship.toml" 2>/dev/null | grep "format =" | sed -E 's/.*format = "\[([^]]*)\]\(.*/\1/')
+        existing_name=${existing_name:-H4CK3R}
+        write_starship_config "$existing_name"
+    fi
+    
+    adjust_ownership "$TARGET_HOME/.config/archify" "$TARGET_HOME/.tmux.conf" "$TARGET_HOME/.config/starship.toml" ; echo -e "${G} [✓] Color theme applied successfully! Reload your shell to see changes.${RS}"
     sleep 2
     menu
 }
@@ -1026,43 +1093,7 @@ install_starship() {
     custom_name=${custom_name:-H4CK3R}
 
     echo -e "${G} [*] Deploying Starship configuration...${RS}"
-    mkdir -p "$TARGET_HOME/.config"
-    cat << EOF > "$TARGET_HOME/.config/starship.toml"
-# Custom Starship Config by H4CK3R - Matches Custom Theme Design
-format = '''
-[┌─\\[](bold blue)\$username[㉿](bold blue)\$hostname[\\]-\\[](bold blue)\$directory[\\]](bold blue)\$git_branch\$git_status
-\$character'''
-
-[username]
-show_always = true
-style_user = "bold red"
-style_root = "bold red"
-format = "[$custom_name](\$style)"
-
-[hostname]
-ssh_only = false
-style = "bold red"
-format = "[KALI](\$style)"
-
-[directory]
-style = "bold green"
-format = "[\$path](\$style)"
-truncation_length = 3
-truncation_symbol = "…/"
-
-[git_branch]
-symbol = " "
-style = "bold red"
-format = '-\\[[git:\\(](bold blue)\$symbol\$branch[\\)](bold blue)\\]'
-
-[git_status]
-style = "bold red"
-format = "[\$all_status\$ahead_behind](\$style)"
-
-[character]
-success_symbol = "[└─╼ ](bold blue)[❯❯❯](bold red) "
-error_symbol = "[└─╼ ](bold blue)[✗❯❯](bold red) "
-EOF
+    write_starship_config "$custom_name"
 
     echo -e "${G} [✓] Starship prompt configured!${RS}"
     
