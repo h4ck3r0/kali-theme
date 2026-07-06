@@ -1476,18 +1476,18 @@ menu() {
     echo -e "\n ${C}─── Shell Customization & Styling ───${RS}"
     printf "  ${DG}[${C}06${DG}]${W} Install Custom Nerd Fonts\n"
     printf "  ${DG}[${C}07${DG}]${W} Install Starship Prompt Preset\n"
-    printf "  ${DG}[${C}15${DG}]${W} Remove/Disable Starship Prompt\n"
-    printf "  ${DG}[${C}08${DG}]${W} Customize Welcome Banner\n"
-    printf "  ${DG}[${C}11${DG}]${W} Choose Theme Color Palette\n"
+    printf "  ${DG}[${C}08${DG}]${W} Remove/Disable Starship Prompt\n"
+    printf "  ${DG}[${C}09${DG}]${W} Customize Welcome Banner\n"
+    printf "  ${DG}[${C}10${DG}]${W} Choose Theme Color Palette\n"
 
     echo -e "\n ${C}─── CLI Utilities & Dev Tools ───${RS}"
-    printf "  ${DG}[${C}09${DG}]${W} Install Modern CLI Utilities (eza, bat, zoxide, etc.)\n"
-    printf "  ${DG}[${C}10${DG}]${W} Customize Tmux Multiplexer\n"
-    printf "  ${DG}[${C}12${DG}]${W} Enable Unified Command History (Atuin)\n"
-    printf "  ${DG}[${C}13${DG}]${W} Configure Dev Tools (Neovim & Git)\n"
+    printf "  ${DG}[${C}11${DG}]${W} Install Modern CLI Utilities (eza, bat, zoxide, etc.)\n"
+    printf "  ${DG}[${C}12${DG}]${W} Customize Tmux Multiplexer\n"
+    printf "  ${DG}[${C}13${DG}]${W} Enable Unified Command History (Atuin)\n"
+    printf "  ${DG}[${C}14${DG}]${W} Configure Dev Tools (Neovim & Git)\n"
 
     echo -e "\n ${C}─── System Maintenance ───${RS}"
-    printf "  ${DG}[${C}14${DG}]${Y} Reset Shell Configuration\n"
+    printf "  ${DG}[${C}15${DG}]${Y} Reset Shell Configuration\n"
     printf "  ${DG}[${C}00${DG}]${R} Exit Script\n"
 
     echo -e ""
@@ -1501,14 +1501,14 @@ menu() {
         5|05) apply_plugins ;;
         6|06) install_nerd_fonts ;;
         7|07) install_starship ;;
-        8|08) customize_banner ;;
-        9|09) install_modern_cli ;;
-        10) setup_tmux ;;
-        11) choose_color_theme ;;
-        12) setup_atuin ;;
-        13) setup_dev_tools ;;
-        14|14) reset_config ;;
-        15) remove_starship ;;
+        8|08) remove_starship ;;
+        9|09) customize_banner ;;
+        10) choose_color_theme ;;
+        11) install_modern_cli ;;
+        12) setup_tmux ;;
+        13) setup_atuin ;;
+        14) setup_dev_tools ;;
+        15) reset_config ;;
         0|00) exit ;;
         *) wr ;;
     esac
