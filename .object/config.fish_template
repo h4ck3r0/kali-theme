@@ -75,7 +75,7 @@ function fish_prompt
             else
                 set_color $ARCHIFY_SUCCESS
                 printf "─[git:(%s)]" $branch
-            fi
+            end
         end
     end
     
