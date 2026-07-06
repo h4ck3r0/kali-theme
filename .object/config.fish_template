@@ -87,15 +87,15 @@ function fish_prompt
         printf "❯"
         set_color $ARCHIFY_SECONDARY
         printf "❯"
-        set_color white
-        printf "❯ "
+        set_color $ARCHIFY_SUCCESS
+        printf "❯  "
     else
         set_color $ARCHIFY_ALERT
         printf "✗"
         set_color $ARCHIFY_SECONDARY
         printf "❯"
-        set_color white
-        printf "❯ "
+        set_color $ARCHIFY_SUCCESS
+        printf "❯  "
     end
     set_color normal
 end

@@ -30,7 +30,7 @@ C_RESET=$'\033[0m'
 # Custom Bash Prompt
 # ┌─[㉿ name@KALI]-[~/path]
 # └─╼ ❯❯❯
-export PS1="\n\\[\${C_PRIMARY}\\]┌─[\\[\${C_SECONDARY}\\]PROC\\[\${C_PRIMARY}\\]㉿\\[\${C_SECONDARY}\\]KALI\\[\${C_PRIMARY}\\]]-[\\[\${C_SUCCESS}\\]\w\\[\${C_PRIMARY}\\]]\n└─╼ \\[\${C_PRIMARY}\\]❯\\[\${C_SECONDARY}\\]❯\\[\${C_WHITE}\\]❯ \\[\${C_RESET}\]"
+export PS1="\n\\[\${C_PRIMARY}\\]┌─[\\[\${C_SECONDARY}\\]PROC\\[\${C_PRIMARY}\\]㉿\\[\${C_SECONDARY}\\]KALI\\[\${C_PRIMARY}\\]]-[\\[\${C_SUCCESS}\\]\w\\[\${C_PRIMARY}\\]]\n└─╼ \\[\${C_PRIMARY}\\]❯\\[\${C_SECONDARY}\\]❯\\[\${C_SUCCESS}\\]❯  \\[\${C_RESET}\]"
 
 # Aliases
 alias ls='ls --color=auto'
