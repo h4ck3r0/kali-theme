@@ -643,13 +643,13 @@ write_starship_config() {
     cat << EOF > "$TARGET_HOME/.config/starship.toml"
 # Custom Starship Config by H4CK3R - Matches Custom Theme Design
 format = '''
-[┌─\\[](bold $primary)\$username[㉿](bold $primary)\$hostname[\\]-\\[](bold $primary)\$directory[\\]](bold $primary)\$git_branch\$git_status
+[┌─\\[](bold $primary)\$username[㉿](bold white)\$hostname[\\]-\\[](bold $primary)\$directory[\\]](bold $primary)\$git_branch\$git_status
 \$character'''
 
 [username]
 show_always = true
-style_user = "bold $secondary"
-style_root = "bold $secondary"
+style_user = "bold $primary"
+style_root = "bold $primary"
 format = "[$custom_name](\$style)"
 
 [hostname]
@@ -673,8 +673,8 @@ style = "bold $secondary"
 format = "[\$all_status\$ahead_behind](\$style)"
 
 [character]
-success_symbol = "[└─╼ ](bold $primary)[❯](bold $primary)[❯](bold $secondary)[❯](bold $success)  "
-error_symbol = "[└─╼ ](bold $primary)[✗](bold red)[❯](bold $secondary)[❯](bold $success)  "
+success_symbol = "[└─╼ ](bold $primary)[❯](bold $primary)[❯](bold $secondary)[❯](bold $success) "
+error_symbol = "[└─╼ ](bold $primary)[✗](bold red)[❯](bold $secondary)[❯](bold $success) "
 EOF
 }
 
