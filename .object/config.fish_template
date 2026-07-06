@@ -51,7 +51,7 @@ function fish_prompt
     echo
     set_color $ARCHIFY_PRIMARY
     printf "┌─["
-    set_color $ARCHIFY_PRIMARY
+    set_color $ARCHIFY_SUCCESS
     printf "PROC"
     set_color white
     printf "@"

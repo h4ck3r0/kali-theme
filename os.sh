@@ -648,8 +648,8 @@ format = '''
 
 [username]
 show_always = true
-style_user = "$primary"
-style_root = "$primary"
+style_user = "$success"
+style_root = "$success"
 format = "[$custom_name](\$style)"
 
 [hostname]
