@@ -673,8 +673,8 @@ style = "bold $secondary"
 format = "[\$all_status\$ahead_behind](\$style)"
 
 [character]
-success_symbol = "[└─╼ ](bold $primary)[❯❯❯](bold $secondary)  "
-error_symbol = "[└─╼ ](bold $primary)[✗❯❯](bold $secondary)  "
+success_symbol = "[└─╼ ](bold $primary)[❯](bold $primary)[❯](bold $secondary)[❯](bold $success)  "
+error_symbol = "[└─╼ ](bold $primary)[✗](bold red)[❯](bold $secondary)[❯](bold $success)  "
 EOF
 }
 
