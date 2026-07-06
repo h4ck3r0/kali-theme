@@ -56,10 +56,6 @@ Kali Linux Theme Installer - An interactive shell customization tool.
 - **Starship Prompt Integration**: Installs and applies a themed Starship preset matching the prompt styling.
 - **Passwordless Shell Changer**: Uses `usermod` instead of `chsh` to switch shells silently without prompting for passwords.
 
-<p align="center">
-  <img src="https://user-images.githubusercontent.com/46929618/150728320-e559415f-2433-475b-8534-e51d294f42de.png" width="300" hight="220">
-</p>
-
 
 ## Installation
 
