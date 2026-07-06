@@ -1126,6 +1126,44 @@ install_starship() {
     menu
 }
 
+# Remove/Disable Starship prompt
+remove_starship() {
+    echo -e "${R}\n [*] Removing/Disabling Starship Prompt...${RS}"
+    
+    # Remove from .zshrc
+    if [ -f "$TARGET_HOME/.zshrc" ]; then
+        echo -e "${G} [*] Removing Starship from .zshrc...${RS}"
+        sed -i '/starship init/d' "$TARGET_HOME/.zshrc"
+    fi
+
+    # Remove from .bashrc
+    if [ -f "$TARGET_HOME/.bashrc" ]; then
+        echo -e "${G} [*] Removing Starship from .bashrc...${RS}"
+        sed -i '/starship init/d' "$TARGET_HOME/.bashrc"
+    fi
+
+    # Remove from config.fish
+    if [ -f "$TARGET_HOME/.config/fish/config.fish" ]; then
+        echo -e "${G} [*] Removing Starship from config.fish...${RS}"
+        if grep -q "starship" "$TARGET_HOME/.config/fish/config.fish"; then
+            sed -i '/# Starship Prompt/,/end/d' "$TARGET_HOME/.config/fish/config.fish" 2>/dev/null || true
+            sed -i '/starship/d' "$TARGET_HOME/.config/fish/config.fish"
+        fi
+    fi
+
+    # Remove starship.toml config
+    if [ -f "$TARGET_HOME/.config/starship.toml" ]; then
+        echo -e "${G} [*] Removing starship.toml configuration...${RS}"
+        rm -f "$TARGET_HOME/.config/starship.toml"
+    fi
+
+    adjust_ownership "$TARGET_HOME/.zshrc" "$TARGET_HOME/.bashrc" "$TARGET_HOME/.config/fish"
+    echo -e "${G} [✓] Starship successfully disabled! Reload your shell to return to the native design.${RS}"
+    sleep 3
+    menu
+}
+
+
 # Reset Configurations
 reset_config() {
     echo -e "${Y}\n [!] Warning: This will back up and reset your current shell configuration files!${RS}"
@@ -1438,6 +1476,7 @@ menu() {
     echo -e "\n ${C}─── Shell Customization & Styling ───${RS}"
     printf "  ${DG}[${C}06${DG}]${W} Install Custom Nerd Fonts\n"
     printf "  ${DG}[${C}07${DG}]${W} Install Starship Prompt Preset\n"
+    printf "  ${DG}[${C}15${DG}]${W} Remove/Disable Starship Prompt\n"
     printf "  ${DG}[${C}08${DG}]${W} Customize Welcome Banner\n"
     printf "  ${DG}[${C}11${DG}]${W} Choose Theme Color Palette\n"
 
@@ -1469,6 +1508,7 @@ menu() {
         12) setup_atuin ;;
         13) setup_dev_tools ;;
         14|14) reset_config ;;
+        15) remove_starship ;;
         0|00) exit ;;
         *) wr ;;
     esac
