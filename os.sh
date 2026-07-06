@@ -165,7 +165,7 @@ apply_zsh_theme() {
     if [[ "$SHELL" != */zsh ]]; then
         read -p " Change default shell to Zsh? [y/N]: " change_shell
         if [[ "$change_shell" =~ ^[Yy]$ ]]; then
-            $SUDO_CMD chsh -s "$(command -v zsh)" "$TARGET_USER"
+            $SUDO_CMD usermod --shell "$(command -v zsh)" "$TARGET_USER" 2>/dev/null || $SUDO_CMD chsh -s "$(command -v zsh)" "$TARGET_USER"
             echo -e "${G} [✓] Shell changed to Zsh. Please log out and back in for changes to take effect.${RS}"
         fi
     fi
@@ -196,7 +196,7 @@ apply_bash_theme() {
     if [[ "$SHELL" != */bash ]]; then
         read -p " Change default shell to Bash? [y/N]: " change_shell
         if [[ "$change_shell" =~ ^[Yy]$ ]]; then
-            $SUDO_CMD chsh -s "$(command -v bash)" "$TARGET_USER"
+            $SUDO_CMD usermod --shell "$(command -v bash)" "$TARGET_USER" 2>/dev/null || $SUDO_CMD chsh -s "$(command -v bash)" "$TARGET_USER"
             echo -e "${G} [✓] Shell changed to Bash. Please log out and back in for changes to take effect.${RS}"
         fi
     fi
@@ -234,7 +234,7 @@ apply_fish_theme() {
     if [[ "$SHELL" != */fish ]]; then
         read -p " Change default shell to Fish? [y/N]: " change_shell
         if [[ "$change_shell" =~ ^[Yy]$ ]]; then
-            $SUDO_CMD chsh -s "$(command -v fish)" "$TARGET_USER"
+            $SUDO_CMD usermod --shell "$(command -v fish)" "$TARGET_USER" 2>/dev/null || $SUDO_CMD chsh -s "$(command -v fish)" "$TARGET_USER"
             echo -e "${G} [✓] Shell changed to Fish. Please log out and back in for changes to take effect.${RS}"
         fi
     fi
