@@ -12,6 +12,8 @@ B='\033[1;34m'
 C='\033[1;36m'
 W='\033[1;97m'
 RS='\033[0m'
+DG='\033[90m'
+
 
 clear
 SUDO_CMD=$(command -v sudo)
@@ -461,12 +463,12 @@ apply_fish_plugins() {
 # Download & Setup Plugins (Submenu)
 apply_plugins() {
     banner
-    echo -e "\n ${B}Select Shell for Plugins:${RS}\n"
-    printf " ${B}[${W}01${B}]${G} Zsh (Auto-Suggestions & Syntax Highlighting)\n"
-    printf " ${B}[${W}02${B}]${G} Bash (ble.sh - Auto-Suggestions & Syntax Highlighting)\n"
-    printf " ${B}[${W}03${B}]${G} Fish (Fisher - Auto-Suggestions & Plugins)\n"
-    printf " ${B}[${W}00${B}]${R} Back to Main Menu\n"
-    echo -e ""
+    echo -e "\n ${C}─── Shell Plugins Configuration ───${RS}"
+    printf "  ${DG}[${C}01${DG}]${W} Zsh (Auto-Suggestions & Syntax Highlighting)\n"
+    printf "  ${DG}[${C}02${DG}]${W} Bash (ble.sh - Auto-Suggestions & Syntax Highlighting)\n"
+    printf "  ${DG}[${C}03${DG}]${W} Fish (Fisher - Auto-Suggestions & Plugins)\n"
+    printf "  ${DG}[${C}00${DG}]${R} Back to Main Menu\n"
+    echo -e " ${DG}──────────────────────────────────────────────────${RS}"
     echo -ne "${B} kali-th${W}@${R}root${W}:${C}~${RS}# "
     read plugin_opt
     case $plugin_opt in
@@ -638,14 +640,14 @@ setup_tmux() {
 # Choose Theme Color Palette Preset
 choose_color_theme() {
     banner
-    echo -e "\n ${B}Select Color Theme Accent:${RS}\n"
-    printf " ${B}[${W}01${B}]${G} Cyberpunk Neon (Magenta & Cyan)\n"
-    printf " ${B}[${W}02${B}]${G} Dracula (Purple & Green)\n"
-    printf " ${B}[${W}03${B}]${G} Nord (Cyan & Blue)\n"
-    printf " ${B}[${W}04${B}]${G} Gruvbox (Yellow & Red)\n"
-    printf " ${B}[${W}05${B}]${G} Kali-TH Default (Blue & Red)\n"
-    printf " ${B}[${W}00${B}]${R} Back to Main Menu\n"
-    echo -e ""
+    echo -e "\n ${C}─── Choose Theme Color Palette ───${RS}"
+    printf "  ${DG}[${C}01${DG}]${W} Cyberpunk Neon (Magenta & Cyan)\n"
+    printf "  ${DG}[${C}02${DG}]${W} Dracula (Purple & Green)\n"
+    printf "  ${DG}[${C}03${DG}]${W} Nord (Cyan & Blue)\n"
+    printf "  ${DG}[${C}04${DG}]${W} Gruvbox (Yellow & Red)\n"
+    printf "  ${DG}[${C}05${DG}]${W} Kali-TH Default (Blue & Red)\n"
+    printf "  ${DG}[${C}00${DG}]${R} Back to Main Menu\n"
+    echo -e " ${DG}──────────────────────────────────────────────────${RS}"
     echo -ne "${B} kali-th${W}@${R}root${W}:${C}~${RS}# "
     read theme_opt
     
@@ -843,27 +845,32 @@ EOF
 # Setup Developer Tools (Neovim & Git)
 setup_dev_tools() {
     banner
-    echo -e "\n ${B}Developer Tools Configuration:${RS}\n"
-    printf " ${B}[1]${G} Install & Configure Neovim (with optional LazyVim config)\n"
-    printf " ${B}[2]${G} Install & Configure Git Enhancements (diff-so-fancy)\n"
-    printf " ${B}[3]${G} Configure Both\n"
-    printf " ${B}[0]${R} Back to Main Menu\n"
-    echo -e ""
-    read -p " Select option [0-3]: " dev_opt
+    echo -e "\n ${C}─── Developer Tools Configuration ───${RS}"
+    printf "  ${DG}[${C}01${DG}]${W} Install & Configure Neovim (with optional LazyVim config)\n"
+    printf "  ${DG}[${C}02${DG}]${W} Install & Configure Git Enhancements (diff-so-fancy)\n"
+    printf "  ${DG}[${C}03${DG}]${W} Configure Both\n"
+    printf "  ${DG}[${C}00${DG}]${R} Back to Main Menu\n"
+    echo -e " ${DG}──────────────────────────────────────────────────${RS}"
+    echo -ne "${B} kali-th${W}@${R}root${W}:${C}~${RS}# "
+    read dev_opt
     
     case $dev_opt in
-        1)
+        1|01)
             configure_nvim
             ;;
-        2)
+        2|02)
             configure_git
             ;;
-        3)
+        3|03)
             configure_nvim
             configure_git
             ;;
-        0|*)
+        0|00)
             menu
+            return
+            ;;
+        *)
+            wr
             return
             ;;
     esac
@@ -1114,18 +1121,21 @@ reset_config() {
 
 # Customize Welcome Banner
 customize_banner() {
-    echo -e "${C}\n [*] Custom Welcome Banner Setup${RS}"
-    echo -e " Choose banner style:"
-    echo -e "  ${B}[1]${G} Fastfetch Banner (Default)"
-    echo -e "  ${B}[2]${G} Custom Text figlet Banner"
-    echo -e "  ${B}[3]${G} Simple Kali ASCII Art"
-    echo -e "  ${B}[4]${R} Disable Welcome Banner"
-    read -p " Select option [1-4]: " banner_opt
+    banner
+    echo -e "\n ${C}─── Custom Welcome Banner Setup ───${RS}"
+    printf "  ${DG}[${C}01${DG}]${W} Fastfetch Banner (Default)\n"
+    printf "  ${DG}[${C}02${DG}]${W} Custom Text Figlet Banner\n"
+    printf "  ${DG}[${C}03${DG}]${W} Simple Kali ASCII Art\n"
+    printf "  ${DG}[${C}04${DG}]${W} Disable Welcome Banner\n"
+    printf "  ${DG}[${C}00${DG}]${R} Back to Main Menu\n"
+    echo -e " ${DG}──────────────────────────────────────────────────${RS}"
+    echo -ne "${B} kali-th${W}@${R}root${W}:${C}~${RS}# "
+    read banner_opt
     
     local banner_script="$TARGET_HOME/.archify-banner.sh"
     
     case $banner_opt in
-        1)
+        1|01)
             echo -e "${G} [*] Setting up Fastfetch Welcome Banner...${RS}"
             if ! command -v fastfetch &>/dev/null; then
                 echo -e "${Y} [!] Fastfetch is not installed. Installing...${RS}"
@@ -1157,19 +1167,21 @@ EOF
             adjust_ownership "$banner_script" "$TARGET_HOME/.config/fastfetch"
             echo -e "${G} [✓] Fastfetch Welcome Banner configured!${RS}"
             ;;
-        2)
+        2|02)
             echo -ne "${C} Enter Custom Banner Text [Default: Kali-TH] ❯ ${RS}"
             read banner_text
             banner_text=${banner_text:-Kali-TH}
             
-            echo -e "\n Choose Figlet Font:"
-            echo -e "  ${B}[1]${G} Standard"
-            echo -e "  ${B}[2]${G} Slant"
-            echo -e "  ${B}[3]${G} Shadow"
-            echo -e "  ${B}[4]${G} Doom"
-            echo -e "  ${B}[5]${G} Block"
-            echo -e "  ${B}[6]${G} ANSI Shadow"
-            read -p " Select option [1-6]: " font_choice
+            echo -e "\n ${C}─── Choose Figlet Font ───${RS}"
+            printf "  ${DG}[${C}1${DG}]${W} Standard\n"
+            printf "  ${DG}[${C}2${DG}]${W} Slant\n"
+            printf "  ${DG}[${C}3${DG}]${W} Shadow\n"
+            printf "  ${DG}[${C}4${DG}]${W} Doom\n"
+            printf "  ${DG}[${C}5${DG}]${W} Block\n"
+            printf "  ${DG}[${C}6${DG}]${W} ANSI Shadow\n"
+            echo -e " ${DG}──────────────────────────${RS}"
+            echo -ne "${B} kali-th${W}@${R}root${W}:${C}~${RS}# "
+            read font_choice
             
             local font_name="standard"
             case $font_choice in
@@ -1181,12 +1193,14 @@ EOF
                 *) font_name="standard" ;;
             esac
             
-            echo -e "\n Choose Color Style:"
-            echo -e "  ${B}[1]${G} Rainbow (lolcat)"
-            echo -e "  ${B}[2]${G} Cyberpunk (Cyan)"
-            echo -e "  ${B}[3]${G} Matrix (Green)"
-            echo -e "  ${B}[4]${G} Plain (White)"
-            read -p " Select option [1-4]: " color_choice
+            echo -e "\n ${C}─── Choose Color Style ───${RS}"
+            printf "  ${DG}[${C}1${DG}]${W} Rainbow (lolcat)\n"
+            printf "  ${DG}[${C}2${DG}]${W} Cyberpunk (Cyan)\n"
+            printf "  ${DG}[${C}3${DG}]${W} Matrix (Green)\n"
+            printf "  ${DG}[${C}4${DG}]${W} Plain (White)\n"
+            echo -e " ${DG}──────────────────────────${RS}"
+            echo -ne "${B} kali-th${W}@${R}root${W}:${C}~${RS}# "
+            read color_choice
             
             local color_code=""
             if [ "$color_choice" = "2" ]; then
@@ -1291,7 +1305,7 @@ EOF
             adjust_ownership "$banner_script" "$figlet_dir"
             echo -e "${G} [✓] Custom Text figlet Banner configured!${RS}"
             ;;
-        3)
+        3|03)
             echo -e "${G} [*] Setting up Simple Kali ASCII Art...${RS}"
             cat << 'EOF' > "$banner_script"
 #!/usr/bin/env bash
@@ -1312,12 +1326,16 @@ EOF
             adjust_ownership "$banner_script"
             echo -e "${G} [✓] Simple Kali ASCII Art configured!${RS}"
             ;;
-        4)
+        4|04)
             echo -e "${Y} [*] Disabling Welcome Banner...${RS}"
             echo -e "#!/usr/bin/env bash\n# Welcome Banner Disabled" > "$banner_script"
             chmod +x "$banner_script"
             adjust_ownership "$banner_script"
             echo -e "${G} [✓] Welcome Banner disabled!${RS}"
+            ;;
+        0|00)
+            menu
+            return
             ;;
         *)
             echo -e "${R} [!] Invalid Option Selected!${RS}"
@@ -1375,22 +1393,33 @@ update_tool() {
 # Interactive Menu
 menu() {
     banner
-    echo -e "\n ${B}Select an option:${RS}\n"
-    printf " ${B}[${W}01${B}]${G} Install Core Dependencies\n"
-    printf " ${B}[${W}02${B}]${G} Apply Custom Zsh Theme & Fastfetch\n"
-    printf " ${B}[${W}03${B}]${G} Apply Custom Bash Theme & Fastfetch\n"
-    printf " ${B}[${W}04${B}]${G} Apply Custom Fish Theme & Fastfetch\n"
-    printf " ${B}[${W}05${B}]${G} Enable Plugins (Zsh, Bash, Fish)\n"
-    printf " ${B}[${W}06${B}]${C} Install Custom Nerd Fonts\n"
-    printf " ${B}[${W}07${B}]${C} Install Starship Prompt Preset\n"
-    printf " ${B}[${W}08${B}]${C} Customize Welcome Banner\n"
-    printf " ${B}[${W}09${B}]${C} Install Modern CLI Utilities (eza, bat, zoxide, etc.)\n"
-    printf " ${B}[${W}10${B}]${C} Customize Tmux Multiplexer\n"
-    printf " ${B}[${W}11${B}]${C} Choose Theme Color Palette\n"
-    printf " ${B}[${W}12${B}]${C} Enable Unified Command History (Atuin)\n"
-    printf " ${B}[${W}13${B}]${C} Configure Dev Tools (Neovim & Git)\n"
-    printf " ${B}[${W}14${B}]${Y} Reset Shell Configuration\n"
-    printf " ${B}[${W}00${B}]${R} Exit Script\n"
+    echo -e "\n ${C}┌──────────────────────────────────────────────────┐"
+    echo -e " ${C}│ ${W}           MAIN MENU - KALI-TH CUSTOMIZER        ${C}│"
+    echo -e " ${C}└──────────────────────────────────────────────────┘${RS}"
+
+    echo -e "\n ${C}─── Core Setup & Shell Themes ───${RS}"
+    printf "  ${DG}[${C}01${DG}]${W} Install Core Dependencies\n"
+    printf "  ${DG}[${C}02${DG}]${W} Apply Custom Zsh Theme & Fastfetch\n"
+    printf "  ${DG}[${C}03${DG}]${W} Apply Custom Bash Theme & Fastfetch\n"
+    printf "  ${DG}[${C}04${DG}]${W} Apply Custom Fish Theme & Fastfetch\n"
+    printf "  ${DG}[${C}05${DG}]${W} Enable Plugins (Zsh, Bash, Fish)\n"
+
+    echo -e "\n ${C}─── Shell Customization & Styling ───${RS}"
+    printf "  ${DG}[${C}06${DG}]${W} Install Custom Nerd Fonts\n"
+    printf "  ${DG}[${C}07${DG}]${W} Install Starship Prompt Preset\n"
+    printf "  ${DG}[${C}08${DG}]${W} Customize Welcome Banner\n"
+    printf "  ${DG}[${C}11${DG}]${W} Choose Theme Color Palette\n"
+
+    echo -e "\n ${C}─── CLI Utilities & Dev Tools ───${RS}"
+    printf "  ${DG}[${C}09${DG}]${W} Install Modern CLI Utilities (eza, bat, zoxide, etc.)\n"
+    printf "  ${DG}[${C}10${DG}]${W} Customize Tmux Multiplexer\n"
+    printf "  ${DG}[${C}12${DG}]${W} Enable Unified Command History (Atuin)\n"
+    printf "  ${DG}[${C}13${DG}]${W} Configure Dev Tools (Neovim & Git)\n"
+
+    echo -e "\n ${C}─── System Maintenance ───${RS}"
+    printf "  ${DG}[${C}14${DG}]${Y} Reset Shell Configuration\n"
+    printf "  ${DG}[${C}00${DG}]${R} Exit Script\n"
+
     echo -e ""
     echo -ne "${B} kali-th${W}@${R}root${W}:${C}~${RS}# "
     read opt
