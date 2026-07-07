@@ -1184,7 +1184,7 @@ EOF
         write_starship_config "$existing_name"
     fi
     
-    adjust_ownership "$TARGET_HOME/.config/archify" "$TARGET_HOME/.tmux.conf" "$TARGET_HOME/.config/starship.toml" ; echo -e "${G} [✓] Color theme applied successfully! Reload your shell to see changes.${RS}"
+    adjust_ownership "$TARGET_HOME/.config/archify" "$TARGET_HOME/.tmux.conf" "$TARGET_HOME/.config/starship.toml" "$TARGET_HOME/.bashrc" "$TARGET_HOME/.zshrc" "$TARGET_HOME/.config/fish/config.fish" ; echo -e "${G} [✓] Color theme applied successfully! Reload your shell to see changes.${RS}"
     sleep 2
     menu
 }
@@ -1297,10 +1297,10 @@ configure_nvim() {
     inst_lazyvim=${inst_lazyvim:-y}
     if [[ "$inst_lazyvim" =~ ^[Yy]$ ]]; then
         echo -e "${G} [*] Backing up existing Neovim configurations...${RS}"
-        [ -d "$TARGET_HOME/.config/nvim" ] && mv "$TARGET_HOME/.config/nvim" "$HOME/.config/nvim.bak"
-        [ -d "$TARGET_HOME/.local/share/nvim" ] && mv "$TARGET_HOME/.local/share/nvim" "$HOME/.local/share/nvim.bak"
-        [ -d "$TARGET_HOME/.local/state/nvim" ] && mv "$TARGET_HOME/.local/state/nvim" "$HOME/.local/state/nvim.bak"
-        [ -d "$TARGET_HOME/.cache/nvim" ] && mv "$TARGET_HOME/.cache/nvim" "$HOME/.cache/nvim.bak"
+        [ -d "$TARGET_HOME/.config/nvim" ] && mv "$TARGET_HOME/.config/nvim" "$TARGET_HOME/.config/nvim.bak"
+        [ -d "$TARGET_HOME/.local/share/nvim" ] && mv "$TARGET_HOME/.local/share/nvim" "$TARGET_HOME/.local/share/nvim.bak"
+        [ -d "$TARGET_HOME/.local/state/nvim" ] && mv "$TARGET_HOME/.local/state/nvim" "$TARGET_HOME/.local/state/nvim.bak"
+        [ -d "$TARGET_HOME/.cache/nvim" ] && mv "$TARGET_HOME/.cache/nvim" "$TARGET_HOME/.cache/nvim.bak"
         
         echo -e "${G} [*] Cloning LazyVim starter config...${RS}"
         if [ "$TARGET_USER" != "$(whoami)" ]; then sudo -u "$TARGET_USER" git clone https://github.com/LazyVim/starter "$TARGET_HOME/.config/nvim"; else git clone https://github.com/LazyVim/starter "$TARGET_HOME/.config/nvim"; fi
@@ -1314,24 +1314,29 @@ configure_git() {
     $SUDO_CMD apt install -y diff-so-fancy
     
     echo -e "${G} [*] Configuring Git preferences (diff-so-fancy pager and colors)...${RS}"
-    git config --global color.ui true
+    local git_cmd="git"
+    if [ "$TARGET_USER" != "$(whoami)" ] && [ -n "$TARGET_USER" ]; then
+        git_cmd="sudo -u $TARGET_USER git"
+    fi
+    
+    $git_cmd config --global color.ui true
     if command -v diff-so-fancy &> /dev/null; then
-        git config --global core.pager "diff-so-fancy | less --tabs=4 -RFX"
-        git config --global interactive.diffFilter "diff-so-fancy --patch"
+        $git_cmd config --global core.pager "diff-so-fancy | less --tabs=4 -RFX"
+        $git_cmd config --global interactive.diffFilter "diff-so-fancy --patch"
         
         # Color styling compatible with diff-so-fancy
-        git config --global color.diff-highlight.oldNormal "red bold"
-        git config --global color.diff-highlight.oldHighlight "red bold 52"
-        git config --global color.diff-highlight.newNormal "green bold"
-        git config --global color.diff-highlight.newHighlight "green bold 22"
+        $git_cmd config --global color.diff-highlight.oldNormal "red bold"
+        $git_cmd config --global color.diff-highlight.oldHighlight "red bold 52"
+        $git_cmd config --global color.diff-highlight.newNormal "green bold"
+        $git_cmd config --global color.diff-highlight.newHighlight "green bold 22"
         
-        git config --global color.diff.meta "11"
-        git config --global color.diff.frag "magenta bold"
-        git config --global color.diff.func "146 bold"
-        git config --global color.diff.old "red bold"
-        git config --global color.diff.new "green bold"
-        git config --global color.diff.commit "yellow bold"
-        git config --global color.diff.whitespace "red reverse"
+        $git_cmd config --global color.diff.meta "11"
+        $git_cmd config --global color.diff.frag "magenta bold"
+        $git_cmd config --global color.diff.func "146 bold"
+        $git_cmd config --global color.diff.old "red bold"
+        $git_cmd config --global color.diff.new "green bold"
+        $git_cmd config --global color.diff.commit "yellow bold"
+        $git_cmd config --global color.diff.whitespace "red reverse"
     fi
     echo -e "${G} [✓] Git configurations applied successfully!${RS}"
 }
@@ -1430,7 +1435,7 @@ install_starship() {
     echo -e "${G}\n [*] Checking Starship Prompt...${RS}"
     if ! command -v starship &> /dev/null; then
         echo -e "${G} [*] Installing Starship prompt using installer script...${RS}"
-        curl -sS https://starship.rs/install.sh | sh -s -- -y
+        curl -sS https://starship.rs/install.sh | $SUDO_CMD sh -s -- -y
     fi
 
     echo -e "${C}"
