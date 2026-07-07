@@ -71,8 +71,8 @@ banner() {
         echo -e "${C}             Kali Linux Customizer      ${RS}"
     fi
     echo -e "${B} ┌──────────────────────────────────────────────────┐"
-    echo -e "${B} │ ${W}Coder  : ${C}Raj Aryan ${B}│ ${W}YouTube : ${G}H4Ck3R ${B}        │"
-    echo -e "${B} │ ${W}Version: ${Y}4.0       ${B}│ ${W}Target  : ${R}Kali Linux ${B}    │"
+    echo -e "${B} │ ${W}Coder  : ${C}Raj Aryan ${B}│ ${W}YouTube : ${G}H4Ck3R ${B}           │"
+    echo -e "${B} │ ${W}Version: ${Y}4.0       ${B}│ ${W}Target  : ${R}Kali Linux ${B}       │"
     echo -e "${B} └──────────────────────────────────────────────────┘${RS}"
 }
 
