@@ -32,11 +32,20 @@ if ! declare -f git_prompt_info > /dev/null; then
     }
 fi
 
+target_prompt_info() {
+    if [ -f "$HOME/.config/archify/target_ip" ]; then
+        local ip=$(cat "$HOME/.config/archify/target_ip" 2>/dev/null)
+        if [ -n "$ip" ]; then
+            echo -n "%F{${ARCHIFY_PRIMARY}}-%F{${ARCHIFY_PRIMARY}}[%F{${ARCHIFY_ALERT}}target:${ip}%F{${ARCHIFY_PRIMARY}}]"
+        fi
+    fi
+}
+
 # Main Prompt Layout
-# ┌─[㉿ name@KALI]-[~/path] [git status]
+# ┌─[㉿ name@KALI]-[~/path]-[target:IP] [git status]
 # └─╼ ❯❯❯
 PROMPT="
-%F{\${ARCHIFY_PRIMARY}}┌─%F{\${ARCHIFY_PRIMARY}}[%F{\${ARCHIFY_SUCCESS}}%B\${SHELL_NAME:-H4CK3R}%b%F{\${ARCHIFY_PRIMARY}}@%B%F{\${ARCHIFY_SECONDARY}}KALI%b%F{\${ARCHIFY_PRIMARY}}]%F{\${ARCHIFY_PRIMARY}}-%F{\${ARCHIFY_PRIMARY}}[%B%F{\${ARCHIFY_SUCCESS}}%~%b%F{\${ARCHIFY_PRIMARY}}]%f \$(git_prompt_info)
+%F{\${ARCHIFY_PRIMARY}}┌─%F{\${ARCHIFY_PRIMARY}}[%F{\${ARCHIFY_SUCCESS}}%B\${SHELL_NAME:-H4CK3R}%b%F{\${ARCHIFY_PRIMARY}}@%B%F{\${ARCHIFY_SECONDARY}}KALI%b%F{\${ARCHIFY_PRIMARY}}]%F{\${ARCHIFY_PRIMARY}}-%F{\${ARCHIFY_PRIMARY}}[%B%F{\${ARCHIFY_SUCCESS}}%~%b%F{\${ARCHIFY_PRIMARY}}]\$(target_prompt_info) \$(git_prompt_info)
 %F{\${ARCHIFY_PRIMARY}}└─╼ %B%F{\${ARCHIFY_PRIMARY}}❯%F{\${ARCHIFY_SECONDARY}}❯%F{\${ARCHIFY_SUCCESS}}❯ %f%b"
 
 # Git Prompt configuration for Oh-My-Zsh (used if OMZ is loaded)

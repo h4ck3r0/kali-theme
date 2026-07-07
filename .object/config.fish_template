@@ -64,6 +64,19 @@ function fish_prompt
     set_color $ARCHIFY_PRIMARY
     printf "]"
     
+    # Target IP integration
+    if test -f "$HOME/.config/archify/target_ip"
+        set -l ip (cat "$HOME/.config/archify/target_ip" 2>/dev/null)
+        if test -n "$ip"
+            set_color $ARCHIFY_PRIMARY
+            printf "-["
+            set_color $ARCHIFY_ALERT
+            printf "target:%s" $ip
+            set_color $ARCHIFY_PRIMARY
+            printf "]"
+        end
+    end
+    
     # Git integration
     if command -v git >/dev/null 2>&1
         if git rev-parse --is-inside-work-tree >/dev/null 2>&1
@@ -130,4 +143,51 @@ end
 # Starship Prompt
 if type -q starship
     starship init fish | source
+end
+
+# Fzf Color Matching
+if test -f "$HOME/.config/archify/fzf_colors.fish"
+    source "$HOME/.config/archify/fzf_colors.fish"
+end
+
+# Pentest Target Helper Functions & Aliases
+alias myip="curl -s https://ifconfig.me && echo '' || curl -s https://api.ipify.org && echo ''"
+alias lports="ss -tulanp || netstat -tulanp"
+alias nmap-fast="nmap -T4 -F"
+alias nmap-full="nmap -p- -sV -sC -T4"
+alias exploit-search="searchsploit"
+
+function target-set
+    if test -z "$argv[1]"
+        echo "Usage: target-set <IP>"
+        return 1
+    end
+    mkdir -p "$HOME/.config/archify"
+    echo "$argv[1]" > "$HOME/.config/archify/target_ip"
+    set -gx RHOST "$argv[1]"
+    set_color green
+    echo "[✓] Target IP set to: $argv[1]"
+    set_color normal
+end
+
+function target-get
+    if test -f "$HOME/.config/archify/target_ip"
+        cat "$HOME/.config/archify/target_ip"
+    else
+        set_color red
+        echo "[!] No target IP set. Use 'target-set <IP>'"
+        set_color normal
+    end
+end
+
+function target-clear
+    rm -f "$HOME/.config/archify/target_ip"
+    set -e RHOST
+    set_color yellow
+    echo "[✓] Target IP cleared."
+    set_color normal
+end
+
+if test -f "$HOME/.config/archify/target_ip"
+    set -gx RHOST (cat "$HOME/.config/archify/target_ip")
 end

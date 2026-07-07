@@ -111,3 +111,45 @@ fi
 if command -v starship &> /dev/null; then
     eval "$(starship init zsh)"
 fi
+
+# Fzf Color Matching
+if [ -f "$HOME/.config/archify/fzf_colors.sh" ]; then
+    source "$HOME/.config/archify/fzf_colors.sh"
+fi
+
+# Pentest Target Helper Functions & Aliases
+alias myip="curl -s https://ifconfig.me && echo '' || curl -s https://api.ipify.org && echo ''"
+alias lports="ss -tulanp || netstat -tulanp"
+alias nmap-fast="nmap -T4 -F"
+alias nmap-full="nmap -p- -sV -sC -T4"
+alias exploit-search="searchsploit"
+
+target-set() {
+    if [ -z "$1" ]; then
+        echo -e "Usage: target-set <IP>"
+        return 1
+    fi
+    mkdir -p "$HOME/.config/archify"
+    echo "$1" > "$HOME/.config/archify/target_ip"
+    export RHOST="$1"
+    echo -e "\033[1;32m[✓] Target IP set to: $1\033[0m"
+}
+
+target-get() {
+    if [ -f "$HOME/.config/archify/target_ip" ]; then
+        cat "$HOME/.config/archify/target_ip"
+    else
+        echo -e "\033[1;31m[!] No target IP set. Use 'target-set <IP>'\033[0m"
+    fi
+}
+
+target-clear() {
+    rm -f "$HOME/.config/archify/target_ip"
+    unset RHOST
+    echo -e "\033[1;33m[✓] Target IP cleared.\033[0m"
+}
+
+# Auto-load target IP as RHOST
+if [ -f "$HOME/.config/archify/target_ip" ]; then
+    export RHOST=$(cat "$HOME/.config/archify/target_ip" 2>/dev/null)
+fi

@@ -28,9 +28,17 @@ C_WHITE=$'\033[1;37m'
 C_RESET=$'\033[0m'
 
 # Custom Bash Prompt
-# ┌─[㉿ name@KALI]-[~/path]
-# └─╼ ❯❯❯
-export PS1="\n\\[\${C_PRIMARY}\\]┌─[\\[\${C_SUCCESS}\\]PROC\\[\${C_PRIMARY}\\]@\\[\${C_SECONDARY}\\]KALI\\[\${C_PRIMARY}\\]]-[\\[\${C_SUCCESS}\\]\w\\[\${C_PRIMARY}\\]]\n└─╼ \\[\${C_PRIMARY}\\]❯\\[\${C_SECONDARY}\\]❯\\[\${C_SUCCESS}\\]❯ \\[\${C_RESET}\]"
+set_bash_prompt() {
+    local target=""
+    if [ -f "$HOME/.config/archify/target_ip" ]; then
+        local ip=$(cat "$HOME/.config/archify/target_ip" 2>/dev/null)
+        if [ -n "$ip" ]; then
+            target="-[\${C_SECONDARY}target:${ip}\${C_PRIMARY}]"
+        fi
+    fi
+    export PS1="\n\[\${C_PRIMARY}\]┌─[\[\${C_SUCCESS}\]PROC\[\${C_PRIMARY}\]@\[\${C_SECONDARY}\]KALI\[\${C_PRIMARY}\]]-[\[\${C_SUCCESS}\]\w\[\${C_PRIMARY}\]]${target}\n└─╼ \[\${C_PRIMARY}\]❯\[\${C_SECONDARY}\]❯\[\${C_SUCCESS}\]❯ \[\${C_RESET}\]"
+}
+PROMPT_COMMAND=set_bash_prompt
 
 # Aliases
 alias ls='ls --color=auto'
@@ -78,6 +86,48 @@ if command -v atuin &> /dev/null; then
     eval "$(atuin init bash)"
 fi
 
+
+# Fzf Color Matching
+if [ -f "$HOME/.config/archify/fzf_colors.sh" ]; then
+    source "$HOME/.config/archify/fzf_colors.sh"
+fi
+
+# Pentest Target Helper Functions & Aliases
+alias myip="curl -s https://ifconfig.me && echo '' || curl -s https://api.ipify.org && echo ''"
+alias lports="ss -tulanp || netstat -tulanp"
+alias nmap-fast="nmap -T4 -F"
+alias nmap-full="nmap -p- -sV -sC -T4"
+alias exploit-search="searchsploit"
+
+target-set() {
+    if [ -z "$1" ]; then
+        echo -e "Usage: target-set <IP>"
+        return 1
+    fi
+    mkdir -p "$HOME/.config/archify"
+    echo "$1" > "$HOME/.config/archify/target_ip"
+    export RHOST="$1"
+    echo -e "\033[1;32m[✓] Target IP set to: $1\033[0m"
+}
+
+target-get() {
+    if [ -f "$HOME/.config/archify/target_ip" ]; then
+        cat "$HOME/.config/archify/target_ip"
+    else
+        echo -e "\033[1;31m[!] No target IP set. Use 'target-set <IP>'\033[0m"
+    fi
+}
+
+target-clear() {
+    rm -f "$HOME/.config/archify/target_ip"
+    unset RHOST
+    echo -e "\033[1;33m[✓] Target IP cleared.\033[0m"
+}
+
+# Auto-load target IP as RHOST
+if [ -f "$HOME/.config/archify/target_ip" ]; then
+    export RHOST=$(cat "$HOME/.config/archify/target_ip" 2>/dev/null)
+fi
 
 # Attach ble.sh
 [[ ${BLE_VERSION-} ]] && ble-attach

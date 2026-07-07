@@ -775,6 +775,150 @@ setup_tmux() {
     menu
 }
 
+# Apply terminal theme colors for popular emulators (Kitty, Alacritty, QTerminal)
+apply_terminal_theme() {
+    local bg="$1"
+    local fg="$2"
+    local primary="$3"
+    local secondary="$4"
+    local success="$5"
+    local alert="$6"
+    local warn="$7"
+    
+    # Kitty configuration
+    local kitty_dir="$TARGET_HOME/.config/kitty"
+    if [ -d "$kitty_dir" ] || [ -f "$TARGET_HOME/.config/kitty/kitty.conf" ]; then
+        mkdir -p "$kitty_dir"
+        echo -e "${G} [*] Configuring Kitty terminal colors...${RS}"
+        cat << EOF > "$kitty_dir/colors.conf"
+# Kitty Color Theme configured by Kali-TH
+background $bg
+foreground $fg
+cursor $primary
+selection_background $secondary
+selection_foreground $bg
+
+color0 #000000
+color8 #555555
+color1 $alert
+color9 $alert
+color2 $success
+color10 $success
+color3 $warn
+color11 $warn
+color4 $secondary
+color12 $secondary
+color5 $primary
+color13 $primary
+color6 $secondary
+color14 $secondary
+color7 $fg
+color15 #ffffff
+EOF
+        if [ -f "$kitty_dir/kitty.conf" ]; then
+            if ! grep -q "include colors.conf" "$kitty_dir/kitty.conf"; then
+                echo "include colors.conf" >> "$kitty_dir/kitty.conf"
+            fi
+        else
+            echo "include colors.conf" > "$kitty_dir/kitty.conf"
+        fi
+        adjust_ownership "$kitty_dir/colors.conf" "$kitty_dir/kitty.conf"
+    fi
+
+    # Alacritty configuration
+    local alacritty_dir="$TARGET_HOME/.config/alacritty"
+    if [ -d "$alacritty_dir" ] || [ -f "$TARGET_HOME/.config/alacritty/alacritty.toml" ]; then
+        mkdir -p "$alacritty_dir"
+        echo -e "${G} [*] Configuring Alacritty terminal colors...${RS}"
+        cat << EOF > "$alacritty_dir/colors.toml"
+# Alacritty Color Theme configured by Kali-TH
+[colors.primary]
+background = "$bg"
+foreground = "$fg"
+
+[colors.cursor]
+text = "$bg"
+cursor = "$primary"
+
+[colors.selection]
+text = "$bg"
+background = "$secondary"
+
+[colors.normal]
+black = "#000000"
+red = "$alert"
+green = "$success"
+yellow = "$warn"
+blue = "$secondary"
+magenta = "$primary"
+cyan = "$secondary"
+white = "$fg"
+
+[colors.bright]
+black = "#555555"
+red = "$alert"
+green = "$success"
+yellow = "$warn"
+blue = "$secondary"
+magenta = "$primary"
+cyan = "$secondary"
+white = "#ffffff"
+EOF
+        if [ -f "$alacritty_dir/alacritty.toml" ]; then
+            if ! grep -q "colors.toml" "$alacritty_dir/alacritty.toml"; then
+                local temp_toml=$(mktemp)
+                echo 'import = ["~/.config/alacritty/colors.toml"]' > "$temp_toml"
+                cat "$alacritty_dir/alacritty.toml" >> "$temp_toml"
+                mv "$temp_toml" "$alacritty_dir/alacritty.toml"
+            fi
+        else
+            echo 'import = ["~/.config/alacritty/colors.toml"]' > "$alacritty_dir/alacritty.toml"
+        fi
+        adjust_ownership "$alacritty_dir/colors.toml" "$alacritty_dir/alacritty.toml"
+    fi
+
+    # QTerminal configuration
+    local qterm_dir="$TARGET_HOME/.config/qterminal.org"
+    if [ -d "$qterm_dir" ]; then
+        echo -e "${G} [*] Configuring QTerminal colors...${RS}"
+        local scheme_dir="$TARGET_HOME/.local/share/qterminal/schemes"
+        mkdir -p "$scheme_dir"
+        cat << EOF > "$scheme_dir/Kali-TH.schema"
+[General]
+name=Kali-TH
+author=H4CK3R
+
+[Colors]
+colorBB=$bg
+colorF=$fg
+color0=#000000
+color8=#555555
+color1=$alert
+color9=$alert
+color2=$success
+color10=$success
+color3=$warn
+color11=$warn
+color4=$secondary
+color12=$secondary
+color5=$primary
+color13=$primary
+color6=$secondary
+color14=$secondary
+color7=$fg
+color15=#ffffff
+EOF
+        local qterm_ini="$qterm_dir/qterminal.ini"
+        if [ -f "$qterm_ini" ]; then
+            sed -i 's/^colorScheme=.*/colorScheme=Kali-TH/' "$qterm_ini"
+            if ! grep -q "^colorScheme=" "$qterm_ini"; then
+                echo "colorScheme=Kali-TH" >> "$qterm_ini"
+            fi
+        fi
+        adjust_ownership "$scheme_dir/Kali-TH.schema" "$qterm_ini"
+    fi
+}
+
 # Choose Theme Color Palette Preset
 choose_color_theme() {
     banner
@@ -797,9 +941,18 @@ choose_color_theme() {
     local c_fish="$TARGET_HOME/.config/archify/colors.fish"
     mkdir -p "$TARGET_HOME/.config/archify"
     
+    local bg=""
+    local fg=""
+    local primary_hex=""
+    local secondary_hex=""
+    local success_hex=""
+    local alert_hex=""
+    local warn_hex=""
+    
     case $theme_opt in
         1|01)
             # Cyberpunk Neon
+            bg="#0f0f1a"; fg="#e0e0ff"; primary_hex="#ff00ff"; secondary_hex="#00ffff"; success_hex="#00ff00"; alert_hex="#ff0055"; warn_hex="#ffff00"
             cat << 'EOF' > "$c_sh"
 export ARCHIFY_PRIMARY='35'
 export ARCHIFY_PRIMARY_NAME='magenta'
@@ -822,6 +975,7 @@ EOF
             ;;
         2|02)
             # Dracula
+            bg="#282a36"; fg="#f8f8f2"; primary_hex="#ff79c6"; secondary_hex="#50fa7b"; success_hex="#8be9fd"; alert_hex="#ff5555"; warn_hex="#f1fa8c"
             cat << 'EOF' > "$c_sh"
 export ARCHIFY_PRIMARY='35'
 export ARCHIFY_PRIMARY_NAME='magenta'
@@ -844,6 +998,7 @@ EOF
             ;;
         3|03)
             # Nord
+            bg="#2e3440"; fg="#d8dee9"; primary_hex="#88c0d0"; secondary_hex="#81a1c1"; success_hex="#a3be8c"; alert_hex="#bf616a"; warn_hex="#ebcb8b"
             cat << 'EOF' > "$c_sh"
 export ARCHIFY_PRIMARY='36'
 export ARCHIFY_PRIMARY_NAME='cyan'
@@ -866,6 +1021,7 @@ EOF
             ;;
         4|04)
             # Gruvbox
+            bg="#282828"; fg="#ebdbb2"; primary_hex="#fabd2f"; secondary_hex="#fb4934"; success_hex="#b8bb26"; alert_hex="#fb4934"; warn_hex="#fabd2f"
             cat << 'EOF' > "$c_sh"
 export ARCHIFY_PRIMARY='33'
 export ARCHIFY_PRIMARY_NAME='yellow'
@@ -888,6 +1044,7 @@ EOF
             ;;
         5|05)
             # Kali-TH Default (Red & Blue)
+            bg="#0f141c"; fg="#e6edf3"; primary_hex="#ff5555"; secondary_hex="#2080ff"; success_hex="#50fa7b"; alert_hex="#ff5555"; warn_hex="#f1fa8c"
             cat << 'EOF' > "$c_sh"
 export ARCHIFY_PRIMARY='31'
 export ARCHIFY_PRIMARY_NAME='red'
@@ -910,6 +1067,7 @@ EOF
             ;;
         6|06)
             # Stealth Matrix (Green & Yellow)
+            bg="#050a05"; fg="#00ff00"; primary_hex="#00ff00"; secondary_hex="#ffff00"; success_hex="#ffffff"; alert_hex="#ff0000"; warn_hex="#ffff00"
             cat << 'EOF' > "$c_sh"
 export ARCHIFY_PRIMARY='32'
 export ARCHIFY_PRIMARY_NAME='green'
@@ -932,6 +1090,7 @@ EOF
             ;;
         7|07)
             # Ice Cold (Tech Blue & Cyan)
+            bg="#0b0f19"; fg="#e2e8f0"; primary_hex="#00aaff"; secondary_hex="#00ffff"; success_hex="#ffffff"; alert_hex="#ff3366"; warn_hex="#ffcc00"
             cat << 'EOF' > "$c_sh"
 export ARCHIFY_PRIMARY='34'
 export ARCHIFY_PRIMARY_NAME='blue'
@@ -961,6 +1120,53 @@ EOF
             return
             ;;
     esac
+    
+    # Apply Terminal Themes
+    if [ -n "$bg" ]; then
+        apply_terminal_theme "$bg" "$fg" "$primary_hex" "$secondary_hex" "$success_hex" "$alert_hex" "$warn_hex"
+        
+        # Build fzf options dynamically
+        local fzf_bg="$bg"
+        local fzf_fg="$fg"
+        local fzf_hl="$primary_hex"
+        local fzf_fg_plus="$fg"
+        local fzf_bg_plus="#363646"
+        if [ "$bg" = "#282a36" ]; then fzf_bg_plus="#44475a"; fi
+        if [ "$bg" = "#2e3440" ]; then fzf_bg_plus="#3b4252"; fi
+        if [ "$bg" = "#282828" ]; then fzf_bg_plus="#3c3836"; fi
+        if [ "$bg" = "#0f0f1a" ]; then fzf_bg_plus="#22223a"; fi
+        if [ "$bg" = "#0f141c" ]; then fzf_bg_plus="#1c2533"; fi
+        if [ "$bg" = "#050a05" ]; then fzf_bg_plus="#122512"; fi
+        if [ "$bg" = "#0b0f19" ]; then fzf_bg_plus="#1d283f"; fi
+
+        local fzf_prompt="$success_hex"
+        local fzf_pointer="$primary_hex"
+        local fzf_marker="$secondary_hex"
+        local fzf_spinner="$warn_hex"
+        
+        local fzf_opts="--color=fg:$fzf_fg,bg:$fzf_bg,hl:$fzf_hl --color=fg+:$fzf_fg_plus,bg+:$fzf_bg_plus,hl+:$fzf_hl --color=info:$fzf_spinner,prompt:$fzf_prompt,pointer:$fzf_pointer --color=marker:$fzf_marker,spinner:$fzf_spinner"
+        
+        cat << EOF > "$TARGET_HOME/.config/archify/fzf_colors.sh"
+# Fzf Color Matching configured by Kali-TH
+export FZF_DEFAULT_OPTS='$fzf_opts'
+EOF
+        cat << EOF > "$TARGET_HOME/.config/archify/fzf_colors.fish"
+# Fzf Color Matching configured by Kali-TH
+set -gx FZF_DEFAULT_OPTS '$fzf_opts'
+EOF
+
+        # Inject fzf source block into shell configurations if not present
+        for rc in "$TARGET_HOME/.bashrc" "$TARGET_HOME/.zshrc"; do
+            if [ -f "$rc" ] && ! grep -q "fzf_colors.sh" "$rc"; then
+                echo -e "\n# Fzf Color Matching\nif [ -f \"\$HOME/.config/archify/fzf_colors.sh\" ]; then\n    source \"\$HOME/.config/archify/fzf_colors.sh\"\nfi" >> "$rc"
+            fi
+        done
+        if [ -f "$TARGET_HOME/.config/fish/config.fish" ] && ! grep -q "fzf_colors.fish" "$TARGET_HOME/.config/fish/config.fish"; then
+            echo -e "\n# Fzf Color Matching\nif test -f \"\$HOME/.config/archify/fzf_colors.fish\"\n    source \"\$HOME/.config/archify/fzf_colors.fish\"\nend" >> "$TARGET_HOME/.config/fish/config.fish"
+        fi
+        
+        adjust_ownership "$TARGET_HOME/.config/archify/fzf_colors.sh" "$TARGET_HOME/.config/archify/fzf_colors.fish"
+    fi
     
     # If tmux is configured, update the theme there too
     if [ -f "$TARGET_HOME/.tmux.conf" ]; then
@@ -1677,6 +1883,45 @@ install_global() {
     menu
 }
 
+# Export active configuration dotfiles (Rice Exporter)
+export_rice() {
+    echo -e "${G}\n [*] Packaging your terminal theme configuration...${RS}"
+    local backup_dir="$TARGET_HOME/.kali-theme-backup"
+    rm -rf "$backup_dir"
+    mkdir -p "$backup_dir/config"
+    
+    # Copy files
+    [ -f "$TARGET_HOME/.zshrc" ] && cp "$TARGET_HOME/.zshrc" "$backup_dir/.zshrc"
+    [ -f "$TARGET_HOME/.bashrc" ] && cp "$TARGET_HOME/.bashrc" "$backup_dir/.bashrc"
+    [ -f "$TARGET_HOME/.tmux.conf" ] && cp "$TARGET_HOME/.tmux.conf" "$backup_dir/.tmux.conf"
+    
+    # Copy folders
+    [ -d "$TARGET_HOME/.config/fish" ] && cp -r "$TARGET_HOME/.config/fish" "$backup_dir/config/fish"
+    [ -d "$TARGET_HOME/.config/fastfetch" ] && cp -r "$TARGET_HOME/.config/fastfetch" "$backup_dir/config/fastfetch"
+    [ -f "$TARGET_HOME/.config/starship.toml" ] && cp "$TARGET_HOME/.config/starship.toml" "$backup_dir/config/starship.toml"
+    [ -d "$TARGET_HOME/.config/archify" ] && cp -r "$TARGET_HOME/.config/archify" "$backup_dir/config/archify"
+    [ -d "$TARGET_HOME/.config/nvim" ] && cp -r "$TARGET_HOME/.config/nvim" "$backup_dir/config/nvim"
+    
+    # Create tarball
+    local dest_file="$TARGET_HOME/kali-theme-rice.tar.gz"
+    echo -e "${G} [*] Creating tarball archive at: $dest_file ...${RS}"
+    
+    # Run in a subshell to avoid changing parent shell working directory
+    (
+        cd "$TARGET_HOME"
+        tar -czf "$dest_file" .kali-theme-backup
+        rm -rf "$backup_dir"
+    )
+    
+    adjust_ownership "$dest_file"
+    
+    echo -e "${G} [✓] Rice successfully exported to $dest_file!${RS}"
+    echo -e "     You can transfer this tarball to another machine and unpack it using:"
+    echo -e "     ${C}tar -xzf kali-theme-rice.tar.gz -C ~${RS}"
+    sleep 4
+    menu
+}
+
 # Interactive Menu
 menu() {
     [ "$CLI_MODE" = true ] && exit 0
@@ -1708,6 +1953,7 @@ menu() {
     echo -e "\n ${C}─── System Maintenance ───${RS}"
     printf "  ${DG}[${C}15${DG}]${Y} Reset Shell Configuration\n"
     printf "  ${DG}[${C}16${DG}]${G} Install Customizer Globally\n"
+    printf "  ${DG}[${C}17${DG}]${W} Export Theme Configuration (Rice Exporter)\n"
     printf "  ${DG}[${C}00${DG}]${R} Exit Script\n"
 
     echo -e ""
@@ -1730,6 +1976,7 @@ menu() {
         14) setup_dev_tools ;;
         15) reset_config ;;
         16) install_global ;;
+        17) export_rice ;;
         0|00) exit ;;
         *) wr ;;
     esac
@@ -1775,6 +2022,7 @@ show_help() {
     echo -e "  --atuin                  Install and enable Atuin shell history sync"
     echo -e "  --dev-tools              Configure developer tools (Neovim & Git diff-so-fancy)"
     echo -e "  --reset                  Reset shell configurations to defaults"
+    echo -e "  --export                 Export theme configuration dotfiles (Rice Exporter)"
     exit 0
 }
 
@@ -1899,6 +2147,10 @@ parse_args() {
             --reset)
                 confirm_reset="y"
                 reset_config
+                exit 0
+                ;;
+            --export)
+                export_rice
                 exit 0
                 ;;
             -n|--name)
