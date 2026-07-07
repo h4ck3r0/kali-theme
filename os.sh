@@ -52,6 +52,22 @@ adjust_ownership() {
     fi
 }
 
+# Resolve paths to template assets, supporting user-custom overrides
+get_template_path() {
+    local file_name="$1"
+    if [ -f "$TARGET_HOME/.config/kali-theme/$file_name" ]; then
+        echo "$TARGET_HOME/.config/kali-theme/$file_name"
+    elif [ -f "$SCRIPT_DIR/.object/$file_name" ]; then
+        echo "$SCRIPT_DIR/.object/$file_name"
+    elif [ -f "$SCRIPT_DIR/$file_name" ]; then
+        echo "$SCRIPT_DIR/$file_name"
+    elif [ -f "/usr/share/kali-theme/$file_name" ]; then
+        echo "/usr/share/kali-theme/$file_name"
+    else
+        echo "$SCRIPT_DIR/.object/$file_name"
+    fi
+}
+
 # Ensure we're in the script directory
 cd "$SCRIPT_DIR" 2>/dev/null
 
@@ -87,6 +103,10 @@ wr() {
 check_kali() {
     if [ ! -f /etc/debian_version ]; then
         echo -e "${R}[!] Warning: This script is designed for Debian/Kali Linux systems.${RS}"
+        if [ $# -gt 0 ]; then
+            echo -e "${Y}[*] CLI arguments detected. Proceeding anyway...${RS}"
+            return 0
+        fi
         read -p "Do you want to proceed anyway? [y/N]: " proceed
         if [[ ! "$proceed" =~ ^[Yy]$ ]]; then
             echo -e "${R}Exiting script.${RS}"
@@ -123,12 +143,17 @@ apply_zsh_theme() {
     fi
 
     echo -e "${C}"
-    read -p " Enter Custom Shell Prompt Name [Default: H4CK3R] ❯ " custom_name
+    if [ "$CLI_MODE" != true ]; then
+        read -p " Enter Custom Shell Prompt Name [Default: H4CK3R] ❯ " custom_name
+    fi
     custom_name=${custom_name:-H4CK3R}
 
     # Oh-My-Zsh Installation Check
     if [ ! -d "$TARGET_HOME/.oh-my-zsh" ]; then
-        read -p " Oh My Zsh is not installed. Install it now? [y/N]: " inst_omz
+        if [ "$CLI_MODE" != true ]; then
+            read -p " Oh My Zsh is not installed. Install it now? [y/N]: " inst_omz
+        fi
+        inst_omz=${inst_omz:-n}
         if [[ "$inst_omz" =~ ^[Yy]$ ]]; then
             echo -e "${G} [*] Downloading & installing Oh My Zsh (unattended)...${RS}"
             if [ "$TARGET_USER" != "$(whoami)" ]; then
@@ -146,24 +171,27 @@ apply_zsh_theme() {
     
     if [ -d "$TARGET_HOME/.oh-my-zsh" ]; then
         mkdir -p "$OMZ_THEMES"
-        sed -e "s/H4CK3R/$custom_name/g" "$SCRIPT_DIR/.object/.h4Ck3r.zsh-theme" > "$OMZ_THEMES/h4Ck3r.zsh-theme"
+        sed -e "s/H4CK3R/$custom_name/g" "$(get_template_path .h4Ck3r.zsh-theme)" > "$OMZ_THEMES/h4Ck3r.zsh-theme"
     fi
     mkdir -p "$STANDALONE_THEMES"
-    sed -e "s/H4CK3R/$custom_name/g" "$SCRIPT_DIR/.object/.h4Ck3r.zsh-theme" > "$STANDALONE_THEMES/h4Ck3r.zsh-theme"
+    sed -e "s/H4CK3R/$custom_name/g" "$(get_template_path .h4Ck3r.zsh-theme)" > "$STANDALONE_THEMES/h4Ck3r.zsh-theme"
 
     # Set up Config
     echo -e "${G} [*] Deploying custom .zshrc...${RS}"
     [ -f "$TARGET_HOME/.zshrc" ] && cp "$TARGET_HOME/.zshrc" "$TARGET_HOME/.zshrc.bak"
-    sed -e "s/PROC/$custom_name/g" "$SCRIPT_DIR/.object/.zshrc_template" > "$TARGET_HOME/.zshrc"
+    sed -e "s/PROC/$custom_name/g" "$(get_template_path .zshrc_template)" > "$TARGET_HOME/.zshrc"
 
     # Deploy Fastfetch Config
     echo -e "${G} [*] Copying Fastfetch configuration...${RS}"
     mkdir -p "$TARGET_HOME/.config/fastfetch"
-    cp "$SCRIPT_DIR/.object/fastfetch_config.jsonc" "$TARGET_HOME/.config/fastfetch/config.jsonc"
+    cp "$(get_template_path fastfetch_config.jsonc)" "$TARGET_HOME/.config/fastfetch/config.jsonc"
 
     # Change Default Shell
     if [[ "$SHELL" != */zsh ]]; then
-        read -p " Change default shell to Zsh? [y/N]: " change_shell
+        if [ "$CLI_MODE" != true ]; then
+            read -p " Change default shell to Zsh? [y/N]: " change_shell
+        fi
+        change_shell=${change_shell:-n}
         if [[ "$change_shell" =~ ^[Yy]$ ]]; then
             $SUDO_CMD usermod --shell "$(command -v zsh)" "$TARGET_USER" 2>/dev/null || $SUDO_CMD chsh -s "$(command -v zsh)" "$TARGET_USER"
             echo -e "${G} [✓] Shell changed to Zsh. Please log out and back in for changes to take effect.${RS}"
@@ -180,21 +208,26 @@ apply_zsh_theme() {
 # Apply custom Bash theme
 apply_bash_theme() {
     echo -e "${C}"
-    read -p " Enter Custom Shell Prompt Name [Default: H4CK3R] ❯ " custom_name
+    if [ "$CLI_MODE" != true ]; then
+        read -p " Enter Custom Shell Prompt Name [Default: H4CK3R] ❯ " custom_name
+    fi
     custom_name=${custom_name:-H4CK3R}
 
     echo -e "${G} [*] Deploying custom .bashrc...${RS}"
     [ -f "$TARGET_HOME/.bashrc" ] && cp "$TARGET_HOME/.bashrc" "$TARGET_HOME/.bashrc.bak"
-    sed -e "s/PROC/$custom_name/g" "$SCRIPT_DIR/.object/.bashrc_template" > "$TARGET_HOME/.bashrc"
+    sed -e "s/PROC/$custom_name/g" "$(get_template_path .bashrc_template)" > "$TARGET_HOME/.bashrc"
 
     # Deploy Fastfetch Config
     echo -e "${G} [*] Copying Fastfetch configuration...${RS}"
     mkdir -p "$TARGET_HOME/.config/fastfetch"
-    cp "$SCRIPT_DIR/.object/fastfetch_config.jsonc" "$TARGET_HOME/.config/fastfetch/config.jsonc"
+    cp "$(get_template_path fastfetch_config.jsonc)" "$TARGET_HOME/.config/fastfetch/config.jsonc"
 
     # Change Default Shell
     if [[ "$SHELL" != */bash ]]; then
-        read -p " Change default shell to Bash? [y/N]: " change_shell
+        if [ "$CLI_MODE" != true ]; then
+            read -p " Change default shell to Bash? [y/N]: " change_shell
+        fi
+        change_shell=${change_shell:-n}
         if [[ "$change_shell" =~ ^[Yy]$ ]]; then
             $SUDO_CMD usermod --shell "$(command -v bash)" "$TARGET_USER" 2>/dev/null || $SUDO_CMD chsh -s "$(command -v bash)" "$TARGET_USER"
             echo -e "${G} [✓] Shell changed to Bash. Please log out and back in for changes to take effect.${RS}"
@@ -217,22 +250,27 @@ apply_fish_theme() {
     fi
 
     echo -e "${C}"
-    read -p " Enter Custom Shell Prompt Name [Default: H4CK3R] ❯ " custom_name
+    if [ "$CLI_MODE" != true ]; then
+        read -p " Enter Custom Shell Prompt Name [Default: H4CK3R] ❯ " custom_name
+    fi
     custom_name=${custom_name:-H4CK3R}
 
     echo -e "${G} [*] Deploying custom config.fish...${RS}"
     mkdir -p "$TARGET_HOME/.config/fish"
     [ -f "$TARGET_HOME/.config/fish/config.fish" ] && cp "$TARGET_HOME/.config/fish/config.fish" "$TARGET_HOME/.config/fish/config.fish.bak"
-    sed -e "s/PROC/$custom_name/g" "$SCRIPT_DIR/.object/config.fish_template" > "$TARGET_HOME/.config/fish/config.fish"
+    sed -e "s/PROC/$custom_name/g" "$(get_template_path config.fish_template)" > "$TARGET_HOME/.config/fish/config.fish"
 
     # Deploy Fastfetch Config
     echo -e "${G} [*] Copying Fastfetch configuration...${RS}"
     mkdir -p "$TARGET_HOME/.config/fastfetch"
-    cp "$SCRIPT_DIR/.object/fastfetch_config.jsonc" "$TARGET_HOME/.config/fastfetch/config.jsonc"
+    cp "$(get_template_path fastfetch_config.jsonc)" "$TARGET_HOME/.config/fastfetch/config.jsonc"
 
     # Change Default Shell
     if [[ "$SHELL" != */fish ]]; then
-        read -p " Change default shell to Fish? [y/N]: " change_shell
+        if [ "$CLI_MODE" != true ]; then
+            read -p " Change default shell to Fish? [y/N]: " change_shell
+        fi
+        change_shell=${change_shell:-n}
         if [[ "$change_shell" =~ ^[Yy]$ ]]; then
             $SUDO_CMD usermod --shell "$(command -v fish)" "$TARGET_USER" 2>/dev/null || $SUDO_CMD chsh -s "$(command -v fish)" "$TARGET_USER"
             echo -e "${G} [✓] Shell changed to Fish. Please log out and back in for changes to take effect.${RS}"
@@ -475,6 +513,7 @@ apply_fish_plugins() {
 
 # Download & Setup Plugins (Submenu)
 apply_plugins() {
+    [ "$CLI_MODE" = true ] && exit 0
     banner
     echo -e "\n ${C}─── Shell Plugins Configuration ───${RS}"
     printf "  ${DG}[${C}01${DG}]${W} Zsh (Auto-Suggestions & Syntax Highlighting)\n"
@@ -705,7 +744,10 @@ setup_tmux() {
     echo -e "${G} [✓] tmux successfully configured!${RS}"
 
     echo -e "${C}"
-    read -p " Would you like to enable Tmux auto-start on terminal launch? [y/N]: " tmux_auto
+    if [ "$CLI_MODE" != true ]; then
+        read -p " Would you like to enable Tmux auto-start on terminal launch? [y/N]: " tmux_auto
+    fi
+    tmux_auto=${tmux_auto:-n}
     if [[ "$tmux_auto" =~ ^[Yy]$ ]]; then
         # Add to .zshrc
         if [ -f "$TARGET_HOME/.zshrc" ]; then
@@ -746,8 +788,10 @@ choose_color_theme() {
     printf "  ${DG}[${C}07${DG}]${W} Ice Cold (Tech Blue & Cyan)\n"
     printf "  ${DG}[${C}00${DG}]${R} Back to Main Menu\n"
     echo -e " ${DG}──────────────────────────────────────────────────${RS}"
-    echo -ne "${B} kali-th${W}@${R}root${W}:${C}~${RS}# "
-    read theme_opt
+    if [ "$CLI_MODE" != true ]; then
+        echo -ne "${B} kali-th${W}@${R}root${W}:${C}~${RS}# "
+        read theme_opt
+    fi
     
     local c_sh="$TARGET_HOME/.config/archify/colors.sh"
     local c_fish="$TARGET_HOME/.config/archify/colors.fish"
@@ -1004,8 +1048,11 @@ setup_dev_tools() {
     printf "  ${DG}[${C}03${DG}]${W} Configure Both\n"
     printf "  ${DG}[${C}00${DG}]${R} Back to Main Menu\n"
     echo -e " ${DG}──────────────────────────────────────────────────${RS}"
-    echo -ne "${B} kali-th${W}@${R}root${W}:${C}~${RS}# "
-    read dev_opt
+    if [ "$CLI_MODE" != true ]; then
+        echo -ne "${B} kali-th${W}@${R}root${W}:${C}~${RS}# "
+        read dev_opt
+    fi
+    dev_opt=${dev_opt:-3}
     
     case $dev_opt in
         1|01)
@@ -1038,7 +1085,10 @@ configure_nvim() {
     echo -e "${G}\n [*] Installing Neovim...${RS}"
     $SUDO_CMD apt install -y neovim
     
-    read -p " Would you like to install the LazyVim theme starter config? [y/N]: " inst_lazyvim
+    if [ "$CLI_MODE" != true ]; then
+        read -p " Would you like to install the LazyVim theme starter config? [y/N]: " inst_lazyvim
+    fi
+    inst_lazyvim=${inst_lazyvim:-y}
     if [[ "$inst_lazyvim" =~ ^[Yy]$ ]]; then
         echo -e "${G} [*] Backing up existing Neovim configurations...${RS}"
         [ -d "$TARGET_HOME/.config/nvim" ] && mv "$TARGET_HOME/.config/nvim" "$HOME/.config/nvim.bak"
@@ -1090,7 +1140,10 @@ install_nerd_fonts() {
     echo -e " ${B}[1]${G} JetBrains Mono Nerd Font (Recommended)"
     echo -e " ${B}[2]${G} Hack Nerd Font"
     echo -e " ${B}[3]${G} Fira Code Nerd Font"
-    read -p " Select option [1-3]: " font_opt
+    if [ "$CLI_MODE" != true ]; then
+        read -p " Select option [1-3]: " font_opt
+    fi
+    font_opt=${font_opt:-1}
 
     case $font_opt in
         2) 
@@ -1175,7 +1228,9 @@ install_starship() {
     fi
 
     echo -e "${C}"
-    read -p " Enter Custom Shell Prompt Name [Default: H4CK3R] ❯ " custom_name
+    if [ "$CLI_MODE" != true ]; then
+        read -p " Enter Custom Shell Prompt Name [Default: H4CK3R] ❯ " custom_name
+    fi
     custom_name=${custom_name:-H4CK3R}
 
     echo -e "${G} [*] Deploying Starship configuration...${RS}"
@@ -1253,7 +1308,10 @@ remove_starship() {
 # Reset Configurations
 reset_config() {
     echo -e "${Y}\n [!] Warning: This will back up and reset your current shell configuration files!${RS}"
-    read -p " Proceed? [y/N]: " confirm_reset
+    if [ "$CLI_MODE" != true ]; then
+        read -p " Proceed? [y/N]: " confirm_reset
+    fi
+    confirm_reset=${confirm_reset:-n}
     if [[ "$confirm_reset" =~ ^[Yy]$ ]]; then
         echo -e "${G} [*] Backing up and resetting .zshrc, .bashrc, and config.fish...${RS}"
         [ -f "$TARGET_HOME/.zshrc" ] && cp "$TARGET_HOME/.zshrc" "$TARGET_HOME/.zshrc.bak" && rm "$TARGET_HOME/.zshrc"
@@ -1284,8 +1342,11 @@ customize_banner() {
     printf "  ${DG}[${C}04${DG}]${W} Disable Welcome Banner\n"
     printf "  ${DG}[${C}00${DG}]${R} Back to Main Menu\n"
     echo -e " ${DG}──────────────────────────────────────────────────${RS}"
-    echo -ne "${B} kali-th${W}@${R}root${W}:${C}~${RS}# "
-    read banner_opt
+    if [ "$CLI_MODE" != true ]; then
+        echo -ne "${B} kali-th${W}@${R}root${W}:${C}~${RS}# "
+        read banner_opt
+    fi
+    banner_opt=${banner_opt:-1}
     
     local banner_script="$TARGET_HOME/.archify-banner.sh"
     
@@ -1299,7 +1360,7 @@ customize_banner() {
             
             mkdir -p "$TARGET_HOME/.config/fastfetch"
             if [ ! -f "$TARGET_HOME/.config/fastfetch/config.jsonc" ]; then
-                cp "$SCRIPT_DIR/.object/fastfetch_config.jsonc" "$TARGET_HOME/.config/fastfetch/config.jsonc" 2>/dev/null || true
+                cp "$(get_template_path fastfetch_config.jsonc)" "$TARGET_HOME/.config/fastfetch/config.jsonc" 2>/dev/null || true
             fi
             
             cat << 'EOF' > "$banner_script"
@@ -1323,20 +1384,24 @@ EOF
             echo -e "${G} [✓] Fastfetch Welcome Banner configured!${RS}"
             ;;
         2|02)
-            echo -ne "${C} Enter Custom Banner Text [Default: Kali-TH] ❯ ${RS}"
-            read banner_text
+            if [ "$CLI_MODE" != true ]; then
+                echo -ne "${C} Enter Custom Banner Text [Default: Kali-TH] ❯ ${RS}"
+                read banner_text
+                banner_text=${banner_text:-Kali-TH}
+                
+                echo -e "\n ${C}─── Choose Figlet Font ───${RS}"
+                printf "  ${DG}[${C}1${DG}]${W} Standard\n"
+                printf "  ${DG}[${C}2${DG}]${W} Slant\n"
+                printf "  ${DG}[${C}3${DG}]${W} Shadow\n"
+                printf "  ${DG}[${C}4${DG}]${W} Doom\n"
+                printf "  ${DG}[${C}5${DG}]${W} Block\n"
+                printf "  ${DG}[${C}6${DG}]${W} ANSI Shadow\n"
+                echo -e " ${DG}──────────────────────────${RS}"
+                echo -ne "${B} kali-th${W}@${R}root${W}:${C}~${RS}# "
+                read font_choice
+            fi
             banner_text=${banner_text:-Kali-TH}
-            
-            echo -e "\n ${C}─── Choose Figlet Font ───${RS}"
-            printf "  ${DG}[${C}1${DG}]${W} Standard\n"
-            printf "  ${DG}[${C}2${DG}]${W} Slant\n"
-            printf "  ${DG}[${C}3${DG}]${W} Shadow\n"
-            printf "  ${DG}[${C}4${DG}]${W} Doom\n"
-            printf "  ${DG}[${C}5${DG}]${W} Block\n"
-            printf "  ${DG}[${C}6${DG}]${W} ANSI Shadow\n"
-            echo -e " ${DG}──────────────────────────${RS}"
-            echo -ne "${B} kali-th${W}@${R}root${W}:${C}~${RS}# "
-            read font_choice
+            font_choice=${font_choice:-1}
             
             local font_name="standard"
             case $font_choice in
@@ -1348,14 +1413,17 @@ EOF
                 *) font_name="standard" ;;
             esac
             
-            echo -e "\n ${C}─── Choose Color Style ───${RS}"
-            printf "  ${DG}[${C}1${DG}]${W} Rainbow (lolcat)\n"
-            printf "  ${DG}[${C}2${DG}]${W} Cyberpunk (Cyan)\n"
-            printf "  ${DG}[${C}3${DG}]${W} Matrix (Green)\n"
-            printf "  ${DG}[${C}4${DG}]${W} Plain (White)\n"
-            echo -e " ${DG}──────────────────────────${RS}"
-            echo -ne "${B} kali-th${W}@${R}root${W}:${C}~${RS}# "
-            read color_choice
+            if [ "$CLI_MODE" != true ]; then
+                echo -e "\n ${C}─── Choose Color Style ───${RS}"
+                printf "  ${DG}[${C}1${DG}]${W} Rainbow (lolcat)\n"
+                printf "  ${DG}[${C}2${DG}]${W} Cyberpunk (Cyan)\n"
+                printf "  ${DG}[${C}3${DG}]${W} Matrix (Green)\n"
+                printf "  ${DG}[${C}4${DG}]${W} Plain (White)\n"
+                echo -e " ${DG}──────────────────────────${RS}"
+                echo -ne "${B} kali-th${W}@${R}root${W}:${C}~${RS}# "
+                read color_choice
+            fi
+            color_choice=${color_choice:-1}
             
             local color_code=""
             if [ "$color_choice" = "2" ]; then
@@ -1366,7 +1434,10 @@ EOF
                 color_code="\\\\033[1;37m"
             fi
             
-            read -p " Include System Info Box? [y/N]: " include_info
+            if [ "$CLI_MODE" != true ]; then
+                read -p " Include System Info Box? [y/N]: " include_info
+            fi
+            include_info=${include_info:-n}
             
             local figlet_dir="$TARGET_HOME/.local/share/figlet"
             mkdir -p "$figlet_dir"
@@ -1545,8 +1616,70 @@ update_tool() {
     fi
 }
 
+# Install Kali-TH Globally
+install_global() {
+    echo -e "${G}\n [*] Installing Kali-TH customizer globally...${RS}"
+    
+    # 1. Create safe known config directory and copy templates
+    local target_conf_dir="$TARGET_HOME/.config/kali-theme"
+    echo -e "${G} [*] Copying templates to safe known location: $target_conf_dir${RS}"
+    mkdir -p "$target_conf_dir"
+    
+    if [ -d "$SCRIPT_DIR/.object" ]; then
+        cp -r "$SCRIPT_DIR/.object/"* "$target_conf_dir/" 2>/dev/null || true
+    elif [ -d "$SCRIPT_DIR" ]; then
+        cp -r "$SCRIPT_DIR/"* "$target_conf_dir/" 2>/dev/null || true
+    fi
+    
+    # Correct ownership of config folder
+    adjust_ownership "$target_conf_dir"
+    
+    # 2. Determine target binary directory
+    local bin_dir=""
+    if [ -w "/usr/local/bin" ]; then
+        bin_dir="/usr/local/bin"
+    elif [ "$(id -u)" -eq 0 ]; then
+        bin_dir="/usr/local/bin"
+    else
+        bin_dir="$TARGET_HOME/.local/bin"
+        mkdir -p "$bin_dir"
+    fi
+    
+    local binary_dest="$bin_dir/kalitheme"
+    local symlink_dest="$bin_dir/kalith"
+    
+    echo -e "${G} [*] Installing executable script to $binary_dest...${RS}"
+    
+    # Copy the script itself
+    $SUDO_CMD cp "$SCRIPT_DIR/os.sh" "$binary_dest" 2>/dev/null || cp "$SCRIPT_DIR/os.sh" "$binary_dest"
+    $SUDO_CMD chmod +x "$binary_dest" 2>/dev/null || chmod +x "$binary_dest"
+    
+    # Create the short alias link/copy
+    $SUDO_CMD ln -sf "$binary_dest" "$symlink_dest" 2>/dev/null || $SUDO_CMD cp "$binary_dest" "$symlink_dest" 2>/dev/null || ln -sf "$binary_dest" "$symlink_dest" 2>/dev/null || cp "$binary_dest" "$symlink_dest"
+    $SUDO_CMD chmod +x "$symlink_dest" 2>/dev/null || chmod +x "$symlink_dest"
+    
+    # Adjust ownership if installed in user local bin
+    if [ "$bin_dir" = "$TARGET_HOME/.local/bin" ]; then
+        adjust_ownership "$binary_dest" "$symlink_dest"
+        
+        # Check if local bin is in PATH, if not warn the user
+        if [[ ":$PATH:" != *":$bin_dir:"* ]]; then
+            echo -e "${Y}\n [!] Warning: '$bin_dir' is not in your PATH.${RS}"
+            echo -e "     Add this line to your shell configuration (.bashrc / .zshrc) to access it:"
+            echo -e "     ${C}export PATH=\"\$PATH:\$HOME/.local/bin\"${RS}"
+        fi
+    fi
+    
+    echo -e "${G}\n [✓] Installation complete!${RS}"
+    echo -e "     You can now run the tool from anywhere using: ${C}kalitheme${RS} or ${C}kalith${RS}"
+    echo -e "     You can modify templates directly at: ${C}$target_conf_dir/${RS}"
+    sleep 4
+    menu
+}
+
 # Interactive Menu
 menu() {
+    [ "$CLI_MODE" = true ] && exit 0
     banner
     echo -e "\n ${C}┌──────────────────────────────────────────────────┐"
     echo -e " ${C}│ ${W}           MAIN MENU - KALI-TH CUSTOMIZER        ${C}│"
@@ -1574,6 +1707,7 @@ menu() {
 
     echo -e "\n ${C}─── System Maintenance ───${RS}"
     printf "  ${DG}[${C}15${DG}]${Y} Reset Shell Configuration\n"
+    printf "  ${DG}[${C}16${DG}]${G} Install Customizer Globally\n"
     printf "  ${DG}[${C}00${DG}]${R} Exit Script\n"
 
     echo -e ""
@@ -1595,6 +1729,7 @@ menu() {
         13) setup_atuin ;;
         14) setup_dev_tools ;;
         15) reset_config ;;
+        16) install_global ;;
         0|00) exit ;;
         *) wr ;;
     esac
@@ -1620,7 +1755,170 @@ check_for_updates() {
     fi
 }
 
+show_help() {
+    echo -e "${C}Kali-TH Customizer - Command Line Interface${RS}"
+    echo -e "Usage: kalith [options] or kalitheme [options]\n"
+    echo -e "Options:"
+    echo -e "  -h, --help               Show this help message and exit"
+    echo -e "  -i, --install-global     Install this tool globally as 'kalith' / 'kalitheme'"
+    echo -e "  -c, --install-core       Install core dependencies (zsh, fish, fastfetch, lolcat, etc.)"
+    echo -e "  -s, --shell <shell>      Apply theme to shell (zsh | bash | fish)"
+    echo -e "  -n, --name <name>        Specify custom prompt name (used with --shell or --starship)"
+    echo -e "  -p, --plugins <shell>    Enable plugins for shell (zsh | bash | fish)"
+    echo -e "  -t, --theme <theme>      Apply color preset (cyberpunk | dracula | nord | gruvbox | default | stealth | ice)"
+    echo -e "  --fonts <1|2|3>          Download & install Nerd Font (1: JetBrains, 2: Hack, 3: FiraCode)"
+    echo -e "  --starship               Install and configure Starship Prompt"
+    echo -e "  --remove-starship        Remove/disable Starship Prompt"
+    echo -e "  --banner <1|2|3|4>       Configure banner (1: Fastfetch, 2: Figlet, 3: ASCII, 4: Disable)"
+    echo -e "  --cli-utils              Install modern CLI utilities (eza, bat, zoxide, etc.)"
+    echo -e "  --tmux                   Install and configure Tmux multiplexer theme"
+    echo -e "  --atuin                  Install and enable Atuin shell history sync"
+    echo -e "  --dev-tools              Configure developer tools (Neovim & Git diff-so-fancy)"
+    echo -e "  --reset                  Reset shell configurations to defaults"
+    exit 0
+}
+
+parse_args() {
+    [ $# -eq 0 ] && return
+    
+    CLI_MODE=true
+    local custom_name="H4CK3R"
+    
+    # Pre-parse name if specified anywhere in args
+    local args=("$@")
+    for ((i=0; i<${#args[@]}; i++)); do
+        if [[ "${args[i]}" == "-n" || "${args[i]}" == "--name" ]]; then
+            custom_name="${args[i+1]}"
+        fi
+    done
+    
+    while [ $# -gt 0 ]; do
+        case "$1" in
+            -h|--help|help)
+                show_help
+                ;;
+            -i|--install-global)
+                install_global
+                exit 0
+                ;;
+            -c|--install-core)
+                install_packages
+                exit 0
+                ;;
+            -s|--shell)
+                shift
+                local sh="$1"
+                if [ "$sh" = "zsh" ]; then
+                    apply_zsh_theme
+                elif [ "$sh" = "bash" ]; then
+                    apply_bash_theme
+                elif [ "$sh" = "fish" ]; then
+                    apply_fish_theme
+                else
+                    echo -e "${R}[!] Invalid shell. Choose zsh, bash, or fish.${RS}"
+                    exit 1
+                fi
+                exit 0
+                ;;
+            -p|--plugins)
+                shift
+                local sh="$1"
+                if [ "$sh" = "zsh" ]; then
+                    apply_zsh_plugins
+                elif [ "$sh" = "bash" ]; then
+                    apply_bash_plugins
+                elif [ "$sh" = "fish" ]; then
+                    apply_fish_plugins
+                else
+                    echo -e "${R}[!] Invalid shell. Choose zsh, bash, or fish.${RS}"
+                    exit 1
+                fi
+                exit 0
+                ;;
+            -t|--theme)
+                shift
+                local theme_choice="$1"
+                case "$theme_choice" in
+                    cyberpunk) theme_opt=1 ;;
+                    dracula)   theme_opt=2 ;;
+                    nord)      theme_opt=3 ;;
+                    gruvbox)   theme_opt=4 ;;
+                    default)   theme_opt=5 ;;
+                    stealth)   theme_opt=6 ;;
+                    ice)       theme_opt=7 ;;
+                    *)
+                        echo -e "${R}[!] Invalid theme. Choose cyberpunk, dracula, nord, gruvbox, default, stealth, or ice.${RS}"
+                        exit 1
+                        ;;
+                esac
+                choose_color_theme
+                exit 0
+                ;;
+            --fonts)
+                shift
+                font_opt="${1:-1}"
+                install_nerd_fonts
+                exit 0
+                ;;
+            --starship)
+                install_starship
+                exit 0
+                ;;
+            --remove-starship)
+                remove_starship
+                exit 0
+                ;;
+            --banner)
+                shift
+                banner_opt="${1:-1}"
+                banner_text="Kali-TH"
+                font_choice=1
+                color_choice=1
+                include_info="n"
+                customize_banner
+                exit 0
+                ;;
+            --cli-utils)
+                install_modern_cli
+                exit 0
+                ;;
+            --tmux)
+                tmux_auto="n"
+                setup_tmux
+                exit 0
+                ;;
+            --atuin)
+                setup_atuin
+                exit 0
+                ;;
+            --dev-tools)
+                inst_lazyvim="y"
+                setup_dev_tools
+                exit 0
+                ;;
+            --reset)
+                confirm_reset="y"
+                reset_config
+                exit 0
+                ;;
+            -n|--name)
+                shift
+                ;;
+            *)
+                echo -e "${R}[!] Unknown option: $1${RS}"
+                echo -e "Use -h or --help to see available commands."
+                exit 1
+                ;;
+        esac
+        shift
+    done
+}
+
 # Entry Point
-check_kali
+if [[ "$1" == "-h" || "$1" == "--help" || "$1" == "help" ]]; then
+    show_help
+fi
+check_kali "$@"
+parse_args "$@"
 check_for_updates
 menu
