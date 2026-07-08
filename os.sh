@@ -733,44 +733,102 @@ EOF
 
 # Setup Custom Tmux configuration
 setup_tmux() {
-    echo -e "${G}\n [*] Installing tmux...${RS}"
-    $SUDO_CMD apt install -y tmux
-    
-    echo -e "${G} [*] Deploying custom .tmux.conf...${RS}"
-    [ -f "$TARGET_HOME/.tmux.conf" ] && cp "$TARGET_HOME/.tmux.conf" "$TARGET_HOME/.tmux.conf.bak"
-    write_tmux_conf
-    
-    adjust_ownership "$TARGET_HOME/.tmux.conf" "$TARGET_HOME/.tmux.conf.bak"
-    echo -e "${G} [✓] tmux successfully configured!${RS}"
+    if [ "$CLI_MODE" = true ]; then
+        # Default CLI action is to install and configure (without auto-start, unless specified)
+        tmux_opt=1
+    else
+        echo -e "\n ${C}─── Tmux Multiplexer Customization ───${RS}"
+        echo -e "  ${B}[1]${G} Install/Configure Custom Tmux${RS}"
+        echo -e "  ${B}[2]${R} Disable/Remove Tmux Customization & Auto-start${RS}"
+        echo -e "  ${B}[3]${Y} Return to Main Menu${RS}"
+        read -p " Select option [1-3]: " tmux_opt
+    fi
 
-    echo -e "${C}"
-    if [ "$CLI_MODE" != true ]; then
-        read -p " Would you like to enable Tmux auto-start on terminal launch? [y/N]: " tmux_auto
-    fi
-    tmux_auto=${tmux_auto:-n}
-    if [[ "$tmux_auto" =~ ^[Yy]$ ]]; then
-        # Add to .zshrc
-        if [ -f "$TARGET_HOME/.zshrc" ]; then
-            if ! grep -q "exec tmux" "$TARGET_HOME/.zshrc"; then
-                echo -e "\n# Auto-start Tmux\nif [ -z \"\$TMUX\" ] && [ -n \"\$PS1\" ]; then\n    exec tmux\nfi" >> "$TARGET_HOME/.zshrc"
+    case "$tmux_opt" in
+        1)
+            echo -e "${G}\n [*] Installing tmux...${RS}"
+            $SUDO_CMD apt install -y tmux
+            
+            echo -e "${G} [*] Deploying custom .tmux.conf...${RS}"
+            [ -f "$TARGET_HOME/.tmux.conf" ] && cp "$TARGET_HOME/.tmux.conf" "$TARGET_HOME/.tmux.conf.bak"
+            write_tmux_conf
+            
+            adjust_ownership "$TARGET_HOME/.tmux.conf" "$TARGET_HOME/.tmux.conf.bak"
+            echo -e "${G} [✓] tmux successfully configured!${RS}"
+
+            echo -e "${C}"
+            if [ "$CLI_MODE" != true ]; then
+                read -p " Would you like to enable Tmux auto-start on terminal launch? [y/N]: " tmux_auto
             fi
-        fi
-        # Add to .bashrc
-        if [ -f "$TARGET_HOME/.bashrc" ]; then
-            if ! grep -q "exec tmux" "$TARGET_HOME/.bashrc"; then
-                echo -e "\n# Auto-start Tmux\nif [ -z \"\$TMUX\" ] && [ -n \"\$PS1\" ]; then\n    exec tmux\nfi" >> "$TARGET_HOME/.bashrc"
+            tmux_auto=${tmux_auto:-n}
+            if [[ "$tmux_auto" =~ ^[Yy]$ ]]; then
+                # Add to .zshrc
+                if [ -f "$TARGET_HOME/.zshrc" ]; then
+                    if ! grep -q "exec tmux" "$TARGET_HOME/.zshrc"; then
+                        echo -e "\n# Auto-start Tmux\nif [ -z \"\$TMUX\" ] && [ -n \"\$PS1\" ]; then\n    exec tmux\nfi" >> "$TARGET_HOME/.zshrc"
+                    fi
+                fi
+                # Add to .bashrc
+                if [ -f "$TARGET_HOME/.bashrc" ]; then
+                    if ! grep -q "exec tmux" "$TARGET_HOME/.bashrc"; then
+                        echo -e "\n# Auto-start Tmux\nif [ -z \"\$TMUX\" ] && [ -n \"\$PS1\" ]; then\n    exec tmux\nfi" >> "$TARGET_HOME/.bashrc"
+                    fi
+                fi
+                # Add to config.fish
+                if [ -d "$TARGET_HOME/.config/fish" ] && [ -f "$TARGET_HOME/.config/fish/config.fish" ]; then
+                    if ! grep -q "exec tmux" "$TARGET_HOME/.config/fish/config.fish"; then
+                        echo -e "\n# Auto-start Tmux\nif not set -q TMUX; and status is-interactive\n    exec tmux\nend" >> "$TARGET_HOME/.config/fish/config.fish"
+                    fi
+                fi
+                echo -e "${G} [✓] Tmux auto-start enabled!${RS}"
+                adjust_ownership "$TARGET_HOME/.zshrc" "$TARGET_HOME/.bashrc" "$TARGET_HOME/.config/fish/config.fish"
             fi
-        fi
-        # Add to config.fish
-        if [ -d "$TARGET_HOME/.config/fish" ] && [ -f "$TARGET_HOME/.config/fish/config.fish" ]; then
-            if ! grep -q "exec tmux" "$TARGET_HOME/.config/fish/config.fish"; then
-                echo -e "\n# Auto-start Tmux\nif not set -q TMUX; and status is-interactive\n    exec tmux\nend" >> "$TARGET_HOME/.config/fish/config.fish"
-            fi
-        fi
-        echo -e "${G} [✓] Tmux auto-start enabled!${RS}"
-        adjust_ownership "$TARGET_HOME/.zshrc" "$TARGET_HOME/.bashrc" "$TARGET_HOME/.config/fish/config.fish"
-    fi
+            sleep 2
+            menu
+            ;;
+        2)
+            remove_tmux
+            ;;
+        *)
+            menu
+            ;;
+    esac
+}
+
+# Remove/Disable Tmux configuration and auto-start
+remove_tmux() {
+    echo -e "${R}\n [*] Removing/Disabling Tmux Configuration & Auto-start...${RS}"
     
+    # Remove from .zshrc
+    if [ -f "$TARGET_HOME/.zshrc" ]; then
+        echo -e "${G} [*] Removing Tmux auto-start from .zshrc...${RS}"
+        sed -i '/# Auto-start Tmux/,+3d' "$TARGET_HOME/.zshrc"
+    fi
+
+    # Remove from .bashrc
+    if [ -f "$TARGET_HOME/.bashrc" ]; then
+        echo -e "${G} [*] Removing Tmux auto-start from .bashrc...${RS}"
+        sed -i '/# Auto-start Tmux/,+3d' "$TARGET_HOME/.bashrc"
+    fi
+
+    # Remove from config.fish
+    if [ -f "$TARGET_HOME/.config/fish/config.fish" ]; then
+        echo -e "${G} [*] Removing Tmux auto-start from config.fish...${RS}"
+        sed -i '/# Auto-start Tmux/,+3d' "$TARGET_HOME/.config/fish/config.fish"
+    fi
+
+    # Restore/Remove .tmux.conf
+    if [ -f "$TARGET_HOME/.tmux.conf" ]; then
+        echo -e "${G} [*] Removing custom .tmux.conf...${RS}"
+        rm -f "$TARGET_HOME/.tmux.conf"
+        if [ -f "$TARGET_HOME/.tmux.conf.bak" ]; then
+            echo -e "${G} [*] Restoring backed up .tmux.conf...${RS}"
+            mv "$TARGET_HOME/.tmux.conf.bak" "$TARGET_HOME/.tmux.conf"
+        fi
+    fi
+
+    adjust_ownership "$TARGET_HOME/.zshrc" "$TARGET_HOME/.bashrc" "$TARGET_HOME/.config/fish/config.fish" "$TARGET_HOME/.tmux.conf"
+    echo -e "${G} [✓] Tmux customization and auto-start successfully disabled!${RS}"
     sleep 2
     menu
 }
@@ -2024,6 +2082,7 @@ show_help() {
     echo -e "  --banner <1|2|3|4>       Configure banner (1: Fastfetch, 2: Figlet, 3: ASCII, 4: Disable)"
     echo -e "  --cli-utils              Install modern CLI utilities (eza, bat, zoxide, etc.)"
     echo -e "  --tmux                   Install and configure Tmux multiplexer theme"
+    echo -e "  --remove-tmux            Remove/disable Tmux custom configuration and auto-start"
     echo -e "  --atuin                  Install and enable Atuin shell history sync"
     echo -e "  --dev-tools              Configure developer tools (Neovim & Git diff-so-fancy)"
     echo -e "  --reset                  Reset shell configurations to defaults"
@@ -2138,6 +2197,10 @@ parse_args() {
             --tmux)
                 tmux_auto="n"
                 setup_tmux
+                exit 0
+                ;;
+            --remove-tmux)
+                remove_tmux
                 exit 0
                 ;;
             --atuin)
